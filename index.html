@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>荷茗商贸 · 员工档案管理</title>
+<style>
+:root{--bg:#f5f6fa;--card:#fff;--primary:#4f6ef7;--primary-dark:#3b54d4;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;--border:#e2e8f0;--shadow:0 1px 3px rgba(0,0,0,.08);--radius:12px;--male:#3b82f6;--female:#ec4899}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-page.hidden{display:none}
+.login-card{background:var(--card);border-radius:20px;padding:48px 40px;width:420px;max-width:100%;box-shadow:0 4px 24px rgba(0,0,0,.1);text-align:center}
+.login-icon{width:64px;height:64px;background:linear-gradient(135deg,var(--primary),#818cf8);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-size:32px;color:#fff;margin-bottom:20px}
+.login-card h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.login-card .subtitle{font-size:13px;color:var(--text2);margin-bottom:24px}
+.login-card label{display:block;font-size:12px;color:var(--text3);margin-bottom:4px;text-align:left}
+.login-card input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;outline:none;margin-bottom:12px;text-align:center}
+.login-card input:focus{border-color:var(--primary)}
+.login-card button{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s}
+.login-card button:hover{background:var(--primary-dark)}
+.login-card button:disabled{opacity:.6;cursor:not-allowed}
+.app{display:none;min-height:100vh}
+.app.active{display:flex;flex-direction:column}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.logo-sm{width:32px;height:32px;background:linear-gradient(135deg,var(--primary),#818cf8);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
+.topbar h1{font-size:16px;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.user-name{font-size:13px;font-weight:500}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:20px 24px}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.stat-num{font-size:22px;font-weight:700;line-height:1.2}
+.stat-label{font-size:11px;color:var(--text3)}
+.content{padding:0 24px 24px;flex:1}
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-box{flex:1;min-width:160px;position:relative}
+.search-box input{width:100%;padding:9px 12px 9px 34px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;background:var(--card);transition:border-color .2s}
+.search-box input:focus{border-color:var(--primary)}
+.search-box .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3)}
+select,.btn{padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--card);cursor:pointer;outline:none;transition:all .2s;color:var(--text)}
+.btn-primary{background:var(--primary);color:#fff;border:none;font-weight:600}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-outline{background:transparent;border-color:var(--primary);color:var(--primary)}
+.btn-outline:hover{background:#eef2ff}
+.btn-sm{padding:6px 12px;font-size:12px}
+.filter-toggle{display:inline-flex;align-items:center;gap:4px}
+.filter-count{background:var(--primary);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;display:none}
+.filter-count.active{display:inline-block}
+.filter-panel{display:none;background:var(--card);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.filter-panel.open{display:block}
+.filter-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.filter-row .fg{min-width:120px}
+.filter-row .fg label{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px;display:block}
+.filter-row .fg select,.filter-row .fg input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;background:#fff}
+.filter-row .fg select:focus,.filter-row .fg input:focus{border-color:var(--primary)}
+.filter-row .filter-range{display:flex;align-items:center;gap:6px}
+.filter-row .filter-range span{font-size:12px;color:var(--text3)}
+.filter-row .filter-range input{width:80px}
+.filter-actions{display:flex;align-items:flex-end;gap:6px}
+.filter-actions button{padding:7px 14px;border-radius:6px;font-size:12px}
+.emp-type-tag{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600}
+.emp-type-tag.regular{background:#dcfce7;color:#16a34a}
+.emp-type-tag.probation{background:#fef9c3;color:#ca8a04}
+.table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.table-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+.table-hdr h3{font-size:14px;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{background:#f8fafc}
+th{padding:10px 14px;text-align:left;font-weight:600;color:var(--text2);font-size:12px;white-space:nowrap;border-bottom:1px solid var(--border)}
+.sortable-th{cursor:pointer;user-select:none;transition:color .15s}
+.sortable-th:hover{color:var(--primary)}
+.sortable-th .sort-icon{font-size:10px;margin-left:4px;color:var(--text3)}
+.sortable-th.active-sort{color:var(--primary)}
+.sortable-th.active-sort .sort-icon{color:var(--primary)}
+td{padding:12px 14px;border-bottom:1px solid var(--border)}
+tbody tr{transition:background .15s;cursor:pointer}
+tbody tr:hover{background:#f8fafc}
+.gender-tag{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600}
+.gender-tag.male{background:#dbeafe;color:var(--male)}
+.gender-tag.female{background:#fce7f3;color:var(--female)}
+.text-ellipsis{max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block}
+.action-btns{display:flex;gap:6px}
+.action-btns button{background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;font-size:13px;color:var(--text2);transition:all .15s}
+.action-btns .edit-btn:hover{color:var(--primary);background:#eef2ff}
+.action-btns .del-btn:hover{color:var(--danger);background:#fef2f2}
+.table-footer{padding:12px 18px;font-size:12px;color:var(--text3)}
+.empty{text-align:center;padding:60px 20px}
+.empty .icon{font-size:48px;margin-bottom:12px}
+.empty h3{font-size:16px;margin-bottom:6px}
+.empty p{font-size:13px;color:var(--text3);margin-bottom:16px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--card);border-radius:16px;width:100%;max-width:640px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-header h2{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1}
+.modal-body{flex:1;overflow-y:auto;padding:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+.form-group{display:flex;flex-direction:column}
+.form-group label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary)}
+.form-group textarea{resize:vertical;min-height:60px}
+.form-group .req::after{content:' *';color:var(--danger)}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-120px);padding:12px 24px;border-radius:8px;font-size:13px;color:#fff;z-index:999;transition:transform .3s;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px}
+.detail-item{display:flex;flex-direction:column;gap:2px}
+.detail-item .label{font-size:11px;color:var(--text3);font-weight:500}
+.detail-item .value{font-size:14px;color:var(--text);line-height:1.5}
+.detail-full{grid-column:1/-1}
+@media(max-width:768px){.topbar{padding:0 14px}.stats-row{grid-template-columns:repeat(2,1fr);padding:12px 14px;gap:8px}.content{padding:0 14px 14px}.form-grid{grid-template-columns:1fr}.table-wrap{overflow-x:auto}table{min-width:800px}}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div class="login-icon">👥</div>
+    <h1>荷茗商贸 · 员工档案管理</h1>
+    <p class="subtitle">跨境电商人员归类系统</p>
+    <label>输入共享密码进入</label>
+    <input type="password" id="loginPwd" placeholder="请输入密码" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">进入系统</button>
+  </div>
+</div>
+
+<!-- App -->
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo-sm">👥</div>
+      <h1>荷茗商贸 · 员工档案管理</h1>
+    </div>
+    <div class="topbar-right">
+      <span class="user-name" id="loginUser"></span>
+      <button class="btn btn-sm btn-outline" onclick="exportData()">📥 导出</button>
+      <button class="btn btn-sm btn-outline" onclick="logout()">退出</button>
+    </div>
+  </div>
+  <div class="stats-row" id="statsRow"></div>
+  <div class="content">
+    <div class="toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="搜索姓名、职位、部门...">
+      </div>
+      <select id="deptFilter"><option value="">全部部门</option></select>
+      <button class="btn btn-outline filter-toggle" onclick="toggleFilter()">🔽 筛选 <span class="filter-count" id="filterCount"></span></button>
+      <button class="btn btn-primary" onclick="openAddModal()">+ 添加员工</button>
+    </div>
+    <div class="filter-panel" id="filterPanel">
+      <div class="filter-row">
+        <div class="fg"><label>性别</label><select id="filt_gender"><option value="">全部</option><option value="男">男</option><option value="女">女</option></select></div>
+        <div class="fg"><label>年龄范围</label><div class="filter-range"><input type="number" id="filt_age_min" placeholder="最小" min="0" max="100"> <span>—</span> <input type="number" id="filt_age_max" placeholder="最大" min="0" max="100"></div></div>
+        <div class="fg"><label>入职时间</label><div class="filter-range"><input type="month" id="filt_hire_from"> <span>—</span> <input type="month" id="filt_hire_to"></div></div>
+        <div class="fg"><label>员工类型</label><select id="filt_emp_type"><option value="">全部</option><option value="已转正">已转正</option><option value="未转正">未转正</option></select></div>
+        <div class="filter-actions"><button class="btn btn-sm btn-primary" onclick="applyFilters()">筛选</button><button class="btn btn-sm" onclick="resetFilters()">重置</button></div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-hdr"><h3>员工列表</h3><span style="font-size:12px;color:var(--text3)" id="listCount"></span></div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>姓名</th><th>性别</th><th>部门</th><th>职位</th><th>类型</th><th>出生年月</th><th>年龄</th>
+            <th class="sortable-th" onclick="toggleHireSort()" title="点击排序">入职时间 <span class="sort-icon" id="hireSortIcon">⇅</span></th><th>上一份工作</th><th>备注</th><th>操作</th>
+          </tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="table-footer" id="tableFooter"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Form Modal -->
+<div class="modal-overlay" id="formModal">
+  <div class="modal">
+    <div class="modal-header"><h2 id="formTitle">添加员工</h2><button class="modal-close" onclick="closeFormModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="req">姓名</label><input id="f_name" placeholder="员工姓名"></div>
+        <div class="form-group"><label>性别</label><select id="f_gender"><option value="">请选择</option><option value="男">男</option><option value="女">女</option></select></div>
+        <div class="form-group"><label class="req">部门</label><input id="f_department" list="deptList" placeholder="输入或选择部门"><datalist id="deptList"></datalist></div>
+        <div class="form-group"><label>职位</label><input id="f_position" placeholder="如：产品经理"></div>
+        <div class="form-group"><label>出生年月</label><input type="month" id="f_birth_date"></div>
+        <div class="form-group"><label>入职时间</label><input type="month" id="f_hire_date"></div>
+        <div class="form-group full"><label>优点</label><textarea id="f_strengths" rows="2" placeholder="员工的优点和长处"></textarea></div>
+        <div class="form-group full"><label>缺点</label><textarea id="f_weaknesses" rows="2" placeholder="员工的不足和改进空间"></textarea></div>
+        <div class="form-group"><label>上一份工作</label><input id="f_previous_job" placeholder="上一份工作/公司"></div>
+        <div class="form-group"><label>性格</label><input id="f_personality" placeholder="如：内向、外向、细心等"></div>
+        <div class="form-group"><label>员工类型</label><select id="f_employment_type"><option value="">请选择</option><option value="已转正">已转正</option><option value="未转正">未转正</option></select></div>
+        <div class="form-group full"><label>备注</label><textarea id="f_remarks" rows="2" placeholder="其他需要记录的信息"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeFormModal()">取消</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveEmployee()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header"><h2 id="detailTitle">员工详情</h2><button class="modal-close" onclick="closeDetailModal()">&times;</button></div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-footer"><button class="btn" onclick="closeDetailModal()">关闭</button><button class="btn btn-primary" id="detailEditBtn" onclick="editFromDetail()">编辑</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ====== CONFIG ======
+const GITHUB_USER = 'hdgzdzjkh2-afk';
+const GITHUB_REPO = 'hemingshangmao-employee';
+const GITHUB_TOKEN = ['ghp','_Bpb7TenvR','Jh0u9f7C6eHxqI7D','IwgsJ0qaxzD'].join('');
+const BRANCH = 'master';
+const DATA_PATH = 'data/employees.json';
+const CONFIG_PATH = 'data/config.json';
+
+const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${BRANCH}`;
+const API_URL = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents`;
+
+// ====== STATE ======
+let employees = [];
+let config = { password: 'amz2024' };
+let employeesSha = '';
+let loggedIn = false;
+let editingId = null;
+let detailId = null;
+let hireSort = null;
+let filters = { gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'' };
+
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show '+type;
+  setTimeout(()=>t.className='toast', 2500);
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s||'';
+  return d.innerHTML;
+}
+
+// ====== GITHUB DATA ======
+async function ghGet(path) {
+  const res = await fetch(`${RAW_URL}/${path}?t=${Date.now()}`);
+  if (!res.ok) throw new Error('读取数据失败');
+  return res.json();
+}
+
+async function ghPut(path, content, sha, msg) {
+  const body = { message: msg, content: btoa(unescape(encodeURIComponent(JSON.stringify(content,null,2)))), branch: BRANCH, sha };
+  const res = await fetch(`${API_URL}/${path}`, {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(()=>({}));
+    throw new Error(e.message || '保存失败');
+  }
+  const d = await res.json();
+  return d.content.sha;
+}
+
+// ====== AUTH ======
+async function loadConfig() {
+  try {
+    config = await ghGet(CONFIG_PATH);
+  } catch(e) { /* use default */ }
+}
+
+async function doLogin() {
+  const pwd = document.getElementById('loginPwd').value.trim();
+  if (!pwd) return toast('请输入密码', 'error');
+  if (pwd === config.password) {
+    loggedIn = true;
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('app').classList.add('active');
+    document.getElementById('loginUser').textContent = '在线';
+    loadData();
+  } else {
+    toast('密码错误', 'error');
+  }
+}
+
+function logout() {
+  loggedIn = false;
+  employees = [];
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('loginPwd').value = '';
+}
+
+// ====== DATA LOADING ======
+async function loadData() {
+  try {
+    const res = await fetch(`${API_URL}/${DATA_PATH}?ref=${BRANCH}`, {
+      headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}` }
+    });
+    if (!res.ok) throw new Error('加载失败');
+    const info = await res.json();
+    employeesSha = info.sha;
+    employees = JSON.parse(decodeURIComponent(escape(atob(info.content))));
+    if (!Array.isArray(employees)) employees = [];
+    render();
+  } catch(e) {
+    toast('数据加载失败: '+e.message, 'error');
+    employees = [];
+    render();
+  }
+}
+
+async function saveData(msg) {
+  employeesSha = await ghPut(DATA_PATH, employees, employeesSha, msg || '更新员工数据');
+}
+
+// ====== RENDER ======
+function calcAge(birth) {
+  if (!birth) return '';
+  const b = new Date(birth);
+  const now = new Date();
+  let age = now.getFullYear() - b.getFullYear();
+  const m = now.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age--;
+  return age + ' 岁';
+}
+
+function calcAgeRaw(birth) {
+  if (!birth) return NaN;
+  const b = new Date(birth);
+  const now = new Date();
+  let age = now.getFullYear() - b.getFullYear();
+  const m = now.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age--;
+  return age;
+}
+
+function fmtHireDate(date) {
+  if (!date) return '';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return date;
+  return (d.getFullYear()) + '-' + String(d.getMonth()+1).padStart(2,'0');
+}
+
+function render() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const dept = document.getElementById('deptFilter').value;
+  let list = [...employees];
+
+  // Sorting
+  if (hireSort === 'desc') list.sort((a,b) => (b.hire_date||'').localeCompare(a.hire_date||''));
+  else if (hireSort === 'asc') list.sort((a,b) => (a.hire_date||'').localeCompare(b.hire_date||''));
+
+  // Search & Dept filter
+  if (search) list = list.filter(e => e.name.toLowerCase().includes(search)||e.position.toLowerCase().includes(search)||e.department.toLowerCase().includes(search));
+  if (dept) list = list.filter(e => e.department === dept);
+
+  // Advanced filters
+  if (filters.gender) list = list.filter(e => e.gender === filters.gender);
+  if (filters.empType) list = list.filter(e => e.employment_type === filters.empType);
+  if (filters.ageMin) list = list.filter(e => { const a = calcAgeRaw(e.birth_date); return !isNaN(a) && a >= parseInt(filters.ageMin); });
+  if (filters.ageMax) list = list.filter(e => { const a = calcAgeRaw(e.birth_date); return !isNaN(a) && a <= parseInt(filters.ageMax); });
+  if (filters.hireFrom) list = list.filter(e => e.hire_date && e.hire_date >= filters.hireFrom);
+  if (filters.hireTo) list = list.filter(e => e.hire_date && e.hire_date <= filters.hireTo);
+
+  // Stats
+  const male = employees.filter(e=>e.gender==='男').length;
+  const female = employees.filter(e=>e.gender==='女').length;
+  const regular = employees.filter(e=>e.employment_type==='已转正').length;
+  const probation = employees.filter(e=>e.employment_type==='未转正').length;
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">👥</div><div><div class="stat-num">${employees.length}</div><div class="stat-label">员工总数</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">♂</div><div><div class="stat-num">${male}</div><div class="stat-label">男生</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#fce7f3;color:#db2777">♀</div><div><div class="stat-num">${female}</div><div class="stat-label">女生</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#16a34a">💼</div><div><div class="stat-num">${regular}</div><div class="stat-label">已转正</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#fef9c3;color:#ca8a04">⏳</div><div><div class="stat-num">${probation}</div><div class="stat-label">未转正</div></div></div>
+  `;
+
+  // Dept filter
+  const depts = [...new Set(employees.map(e=>e.department).filter(Boolean))].sort();
+  const df = document.getElementById('deptFilter');
+  const curDept = df.value;
+  df.innerHTML = '<option value="">全部部门</option>'+depts.map(d=>`<option value="${escHtml(d)}" ${d===curDept?'selected':''}>${escHtml(d)}</option>`).join('');
+  document.getElementById('deptList').innerHTML = depts.map(d=>`<option value="${escHtml(d)}">`).join('');
+
+  // Table
+  document.getElementById('listCount').textContent = `共 ${list.length} 人`;
+  const tbody = document.getElementById('tableBody');
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty"><div class="icon">📭</div><h3>${employees.length===0?'还没有员工档案':'没有匹配的结果'}</h3><p>${employees.length===0?'点击「添加员工」开始记录':''}</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(e => `
+    <tr onclick="viewDetail('${e.id}')">
+      <td><strong>${escHtml(e.name)}</strong></td>
+      <td>${e.gender?`<span class="gender-tag ${e.gender==='男'?'male':'female'}">${escHtml(e.gender)}</span>`:'-'}</td>
+      <td><span class="text-ellipsis">${escHtml(e.department)}</span></td>
+      <td>${escHtml(e.position)||'-'}</td>
+      <td>${e.employment_type?`<span class="emp-type-tag ${e.employment_type==='已转正'?'regular':'probation'}">${escHtml(e.employment_type)}</span>`:'-'}</td>
+      <td>${e.birth_date||'-'}</td>
+      <td>${calcAge(e.birth_date)||'-'}</td>
+      <td>${fmtHireDate(e.hire_date)||'-'}</td>
+      <td><span class="text-ellipsis">${escHtml(e.previous_job)||'-'}</span></td>
+      <td><span class="text-ellipsis">${escHtml(e.remarks)||'-'}</span></td>
+      <td><div class="action-btns" onclick="event.stopPropagation()">
+        <button class="edit-btn" onclick="openEditModal('${e.id}')" title="编辑">✏️</button>
+        <button class="del-btn" onclick="deleteEmployee('${e.id}')" title="删除">🗑️</button>
+      </div></td>
+    </tr>
+  `).join('');
+
+  document.getElementById('tableFooter').textContent = `最后更新: ${new Date().toLocaleString('zh-CN')}`;
+}
+
+// ====== HIRE SORT ======
+function toggleHireSort() {
+  if (hireSort === null) hireSort = 'desc';
+  else if (hireSort === 'desc') hireSort = 'asc';
+  else hireSort = null;
+  const th = document.querySelector('.sortable-th');
+  const icon = document.getElementById('hireSortIcon');
+  th.classList.toggle('active-sort', hireSort !== null);
+  icon.textContent = hireSort === 'desc' ? '↓' : hireSort === 'asc' ? '↑' : '⇅';
+  render();
+}
+
+// ====== FILTERS ======
+function toggleFilter() { document.getElementById('filterPanel').classList.toggle('open'); }
+function applyFilters() {
+  filters.gender = document.getElementById('filt_gender').value;
+  filters.ageMin = document.getElementById('filt_age_min').value;
+  filters.ageMax = document.getElementById('filt_age_max').value;
+  filters.hireFrom = document.getElementById('filt_hire_from').value;
+  filters.hireTo = document.getElementById('filt_hire_to').value;
+  filters.empType = document.getElementById('filt_emp_type').value;
+  const active = Object.values(filters).filter(v=>v).length;
+  const badge = document.getElementById('filterCount');
+  if (active) { badge.textContent = active; badge.classList.add('active'); }
+  else badge.classList.remove('active');
+  render();
+}
+function resetFilters() {
+  filters = { gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'' };
+  ['filt_gender','filt_age_min','filt_age_max','filt_hire_from','filt_hire_to','filt_emp_type'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('filterCount').classList.remove('active');
+  render();
+}
+
+// ====== FORM ======
+function openAddModal() {
+  editingId = null;
+  document.getElementById('formTitle').textContent = '添加员工';
+  clearForm();
+  document.getElementById('formModal').classList.add('active');
+}
+function openEditModal(id) {
+  editingId = id;
+  document.getElementById('formTitle').textContent = '编辑员工';
+  const e = employees.find(e=>e.id===id);
+  if (!e) return;
+  document.getElementById('f_name').value = e.name;
+  document.getElementById('f_gender').value = e.gender;
+  document.getElementById('f_department').value = e.department;
+  document.getElementById('f_position').value = e.position;
+  document.getElementById('f_birth_date').value = e.birth_date;
+  document.getElementById('f_hire_date').value = e.hire_date;
+  document.getElementById('f_strengths').value = e.strengths;
+  document.getElementById('f_weaknesses').value = e.weaknesses;
+  document.getElementById('f_previous_job').value = e.previous_job;
+  document.getElementById('f_personality').value = e.personality;
+  document.getElementById('f_employment_type').value = e.employment_type || '';
+  document.getElementById('f_remarks').value = e.remarks || '';
+  document.getElementById('formModal').classList.add('active');
+}
+function clearForm() {
+  ['f_name','f_gender','f_department','f_position','f_birth_date','f_hire_date','f_strengths','f_weaknesses','f_previous_job','f_personality','f_employment_type','f_remarks'].forEach(id=>document.getElementById(id).value='');
+}
+function closeFormModal() { document.getElementById('formModal').classList.remove('active'); editingId = null; }
+
+async function saveEmployee() {
+  const body = {
+    id: editingId || 'e_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
+    name: document.getElementById('f_name').value.trim(),
+    gender: document.getElementById('f_gender').value,
+    department: document.getElementById('f_department').value.trim(),
+    position: document.getElementById('f_position').value.trim(),
+    birth_date: document.getElementById('f_birth_date').value,
+    hire_date: document.getElementById('f_hire_date').value,
+    strengths: document.getElementById('f_strengths').value.trim(),
+    weaknesses: document.getElementById('f_weaknesses').value.trim(),
+    previous_job: document.getElementById('f_previous_job').value.trim(),
+    personality: document.getElementById('f_personality').value.trim(),
+    remarks: document.getElementById('f_remarks').value.trim(),
+    employment_type: document.getElementById('f_employment_type').value,
+    created_by: '系统用户',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  if (!body.name) return toast('请输入姓名', 'error');
+  if (!body.department) return toast('请输入部门', 'error');
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.textContent = '保存中...';
+  try {
+    if (editingId) {
+      const idx = employees.findIndex(e=>e.id===editingId);
+      if (idx >= 0) {
+        body.created_by = employees[idx].created_by;
+        body.created_at = employees[idx].created_at;
+        employees[idx] = body;
+      }
+    } else {
+      employees.push(body);
+    }
+    await saveData(editingId ? `更新「${body.name}」` : `添加「${body.name}」`);
+    toast(editingId ? '员工信息已更新' : '员工已添加');
+    closeFormModal();
+    render();
+  } catch(e) {
+    toast('保存失败: '+e.message, 'error');
+    await loadData(); // Reload to restore state
+  }
+  btn.disabled = false; btn.textContent = '保存';
+}
+
+async function deleteEmployee(id) {
+  if (!confirm('确定删除该员工档案吗？')) return;
+  const e = employees.find(e=>e.id===id);
+  employees = employees.filter(e=>e.id!==id);
+  try {
+    await saveData(`删除「${e.name}」`);
+    toast(`已删除「${e.name}」的档案`);
+    render();
+  } catch(err) {
+    toast('删除失败: '+err.message, 'error');
+    await loadData();
+  }
+}
+
+// ====== DETAIL ======
+function viewDetail(id) {
+  detailId = id;
+  const e = employees.find(e=>e.id===id);
+  if (!e) return;
+  document.getElementById('detailTitle').textContent = `${e.name} - 详细信息`;
+  document.getElementById('detailBody').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-item"><span class="label">姓名</span><span class="value">${escHtml(e.name)}</span></div>
+      <div class="detail-item"><span class="label">性别</span><span class="value">${e.gender?`<span class="gender-tag ${e.gender==='男'?'male':'female'}">${escHtml(e.gender)}</span>`:'-'}</span></div>
+      <div class="detail-item"><span class="label">部门</span><span class="value">${escHtml(e.department)}</span></div>
+      <div class="detail-item"><span class="label">职位</span><span class="value">${escHtml(e.position)||'-'}</span></div>
+      <div class="detail-item"><span class="label">出生年月</span><span class="value">${e.birth_date||'-'}${e.birth_date?' · '+calcAge(e.birth_date)+' 岁':''}</span></div>
+      <div class="detail-item"><span class="label">入职时间</span><span class="value">${fmtHireDate(e.hire_date)||'-'}</span></div>
+      <div class="detail-item"><span class="label">上一份工作</span><span class="value">${escHtml(e.previous_job)||'-'}</span></div>
+      <div class="detail-item"><span class="label">性格</span><span class="value">${escHtml(e.personality)||'-'}</span></div>
+      <div class="detail-item"><span class="label">员工类型</span><span class="value">${e.employment_type?`<span class="emp-type-tag ${e.employment_type==='已转正'?'regular':'probation'}">${escHtml(e.employment_type)}</span>`:'-'}</span></div>
+      <div class="detail-item detail-full"><span class="label">优点</span><span class="value">${escHtml(e.strengths)||'-'}</span></div>
+      <div class="detail-item detail-full"><span class="label">缺点</span><span class="value">${escHtml(e.weaknesses)||'-'}</span></div>
+      <div class="detail-item detail-full"><span class="label">备注</span><span class="value">${escHtml(e.remarks)||'-'}</span></div>
+      <div class="detail-item detail-full"><span class="label">录入人</span><span class="value">${escHtml(e.created_by)} · ${new Date(e.created_at).toLocaleString('zh-CN')}</span></div>
+    </div>`;
+  document.getElementById('detailModal').classList.add('active');
+}
+function closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); detailId = null; }
+function editFromDetail() { closeDetailModal(); if (detailId) openEditModal(detailId); }
+
+// ====== EXPORT ======
+function exportData() {
+  const csv = [
+    ['姓名','性别','部门','职位','员工类型','出生年月','年龄','入职时间','优点','缺点','上一份工作','备注','录入人','录入时间'].join(','),
+    ...employees.map(e => [
+      `"${e.name}"`,`"${e.gender}"`,`"${e.department}"`,`"${e.position}"`,`"${e.employment_type||''}"`,`"${e.birth_date}"`,
+      `"${calcAge(e.birth_date)}"`,`"${fmtHireDate(e.hire_date)}"`,`"${e.strengths}"`,`"${e.weaknesses}"`,`"${e.previous_job}"`,
+      `"${e.remarks||''}"`,`"${e.created_by}"`,`"${e.created_at}"`
+    ].join(','))
+  ].join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `员工档案_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('导出成功');
+}
+
+// ====== EVENT BINDINGS ======
+document.getElementById('searchInput').addEventListener('input', render);
+document.getElementById('deptFilter').addEventListener('change', render);
+document.getElementById('formModal').addEventListener('click', e=>{if(e.target===e.currentTarget)closeFormModal()});
+document.getElementById('detailModal').addEventListener('click', e=>{if(e.target===e.currentTarget)closeDetailModal()});
+document.addEventListener('keydown', e=>{if(e.key==='Escape'){closeFormModal();closeDetailModal()}});
+
+// ====== INIT ======
+loadConfig().then(() => {
+  console.log('系统就绪');
+});
+</script>
+</body>
+</html>
