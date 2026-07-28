@@ -1,0 +1,15 @@
+{
+  "name": "employee-workbench",
+  "version": "1.0.0",
+  "description": "员工档案管理系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js --dev"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "localtunnel": "^2.0.2"
+  }
+}
