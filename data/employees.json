@@ -656,5 +656,23 @@
     "created_by": "系统用户",
     "created_at": "2026-07-30T01:52:51.959Z",
     "updated_at": "2026-07-30T01:53:37.328Z"
+  },
+  {
+    "id": "e_1785376478481_gsy2up",
+    "name": "程锦蒲",
+    "gender": "男",
+    "department": "安澜组",
+    "position": "运营",
+    "birth_date": "1998-07",
+    "hire_date": "2026-03",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "离职原因：另有安排",
+    "employment_type": "已离职",
+    "created_by": "系统用户",
+    "created_at": "2026-07-30T01:54:38.481Z",
+    "updated_at": "2026-07-30T01:54:38.481Z"
   }
 ]
