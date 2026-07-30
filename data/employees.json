@@ -473,20 +473,19 @@
     "id": "b4b2d4d2-ddaf-4629-b97a-b2e7bde77571",
     "name": "庄宗阳",
     "gender": "男",
-    "birth_date": "2004-01",
     "department": "晨曦组",
     "position": "运营",
+    "birth_date": "2004-01",
     "hire_date": "2026-06",
     "strengths": "",
     "weaknesses": "",
-    "previous_job": "",
+    "previous_job": "刚退伍-无工作经验",
     "personality": "",
     "remarks": "会独立思考，比较认真",
     "employment_type": "未转正",
     "created_by": "Celeste",
-    "created_by_id": "4d602b71-bdbd-408a-b2c5-005d7afeae34",
     "created_at": "2026-07-28T06:40:46.162Z",
-    "updated_at": "2026-07-28T08:22:41.348Z"
+    "updated_at": "2026-07-30T02:42:51.197Z"
   },
   {
     "id": "a0dcf0d4-7439-40e4-a656-6615ac673035",
