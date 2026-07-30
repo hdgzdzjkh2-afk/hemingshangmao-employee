@@ -433,20 +433,19 @@
     "id": "3e0d4949-ac9c-4d46-9498-b069e2e60a8e",
     "name": "邢旭浩",
     "gender": "男",
-    "birth_date": "2005-03",
     "department": "鸿鹄组",
     "position": "运营",
+    "birth_date": "2005-03",
     "hire_date": "2026-07",
     "strengths": "",
     "weaknesses": "",
-    "previous_job": "",
+    "previous_job": "无工作经验",
     "personality": "",
     "remarks": "细心，有礼貌",
     "employment_type": "未转正",
     "created_by": "Celeste",
-    "created_by_id": "4d602b71-bdbd-408a-b2c5-005d7afeae34",
     "created_at": "2026-07-28T06:38:45.803Z",
-    "updated_at": "2026-07-28T07:57:08.553Z"
+    "updated_at": "2026-07-30T02:43:15.804Z"
   },
   {
     "id": "eea11bef-129a-44b1-a0e0-8ee4530e540a",
