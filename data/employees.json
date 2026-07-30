@@ -746,5 +746,23 @@
     "created_by": "系统用户",
     "created_at": "2026-07-30T02:14:39.001Z",
     "updated_at": "2026-07-30T02:14:39.001Z"
+  },
+  {
+    "id": "e_1785377772777_nffqqj",
+    "name": "焦亚哲",
+    "gender": "男",
+    "department": "鸿鹄组",
+    "position": "运营",
+    "birth_date": "2002-11",
+    "hire_date": "2026-07",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "淘汰原因：有自己运营的亚马逊店铺，目的不纯",
+    "employment_type": "已淘汰",
+    "created_by": "系统用户",
+    "created_at": "2026-07-30T02:16:12.777Z",
+    "updated_at": "2026-07-30T02:16:12.777Z"
   }
 ]
