@@ -209,20 +209,19 @@
     "id": "cf725034-9791-4da9-aacb-d5809518de1b",
     "name": "王佳琪",
     "gender": "女",
-    "birth_date": "2005-12",
     "department": "无言组",
     "position": "运营",
+    "birth_date": "2005-12",
     "hire_date": "2026-05",
     "strengths": "",
     "weaknesses": "",
     "previous_job": "启辰科技-剪辑",
     "personality": "",
-    "remarks": "经常加班，工作态度不错，但是话少",
+    "remarks": "经常加班，工作态度不错，但是比较内向",
     "employment_type": "未转正",
     "created_by": "Celeste",
-    "created_by_id": "4d602b71-bdbd-408a-b2c5-005d7afeae34",
     "created_at": "2026-07-28T03:51:45.691Z",
-    "updated_at": "2026-07-28T09:52:47.391Z"
+    "updated_at": "2026-07-30T02:54:46.364Z"
   },
   {
     "id": "7c25e569-ba64-4500-8c96-93ea78cadea0",
