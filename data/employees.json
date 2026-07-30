@@ -487,20 +487,19 @@
     "id": "a0dcf0d4-7439-40e4-a656-6615ac673035",
     "name": "任佳瑶",
     "gender": "女",
-    "birth_date": "2001-12",
     "department": "晨曦组",
     "position": "运营",
+    "birth_date": "2001-12",
     "hire_date": "2026-05",
     "strengths": "",
     "weaknesses": "",
     "previous_job": "博闻美术-美术老师",
     "personality": "",
-    "remarks": "经常加班，努力但不够细心",
+    "remarks": "经常加班，很努力",
     "employment_type": "未转正",
     "created_by": "Celeste",
-    "created_by_id": "4d602b71-bdbd-408a-b2c5-005d7afeae34",
     "created_at": "2026-07-28T06:41:30.722Z",
-    "updated_at": "2026-07-28T08:48:33.742Z"
+    "updated_at": "2026-07-30T02:54:08.275Z"
   },
   {
     "id": "06f6ad22-94fb-4d5e-ab18-ea64fcee41f7",
