@@ -377,20 +377,19 @@
     "id": "cf0b7d24-c6c6-4151-9258-868873c4e5dd",
     "name": "丁柯翔",
     "gender": "男",
-    "birth_date": "2006-04",
     "department": "鸿鹄组",
     "position": "运营",
+    "birth_date": "2006-04",
     "hire_date": "2026-07",
     "strengths": "",
     "weaknesses": "",
-    "previous_job": "",
+    "previous_job": "无工作经验",
     "personality": "",
     "remarks": "活泼、积极、爱问",
     "employment_type": "未转正",
     "created_by": "Celeste",
-    "created_by_id": "4d602b71-bdbd-408a-b2c5-005d7afeae34",
     "created_at": "2026-07-28T06:06:15.670Z",
-    "updated_at": "2026-07-28T07:57:26.201Z"
+    "updated_at": "2026-07-30T02:43:08.915Z"
   },
   {
     "id": "cc06ffc6-446d-4a94-a422-a0cb05f675a8",
