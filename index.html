@@ -513,7 +513,7 @@ function render() {
       <td>${calcAge(e.birth_date)||'-'}</td>
       <td>${fmtHireDate(e.hire_date)||'-'}</td>
       <td><span class="text-ellipsis">${escHtml(e.previous_job)||'-'}</span></td>
-      <td><span class="text-ellipsis">${escHtml(e.remarks)||'-'}</span></td>
+      <td>${e.remarks?`<span class="emp-type-tag ${typeClass(e.employment_type)}">${escHtml(e.remarks)}</span>`:'-'}</td>
       <td><div class="action-btns" onclick="event.stopPropagation()">
         <button class="edit-btn" onclick="openEditModal('${e.id}')" title="编辑">✏️</button>
         <button class="del-btn" onclick="deleteEmployee('${e.id}')" title="删除">🗑️</button>
@@ -534,12 +534,9 @@ function renderDeptTags() {
     return;
   }
   el.innerHTML = list.map(d => {
-    const isPreset = departments.includes(d);
     const count = employees.filter(e => e.department === d).length;
-    const bg = isPreset ? '#eef2ff' : '#f1f5f9';
-    const color = isPreset ? 'var(--primary)' : '#64748b';
     return `
-    <span style="display:inline-flex;align-items:center;gap:4px;background:${bg};color:${color};padding:4px 12px;border-radius:20px;font-size:12px;">
+    <span style="display:inline-flex;align-items:center;gap:4px;background:#eef2ff;color:var(--primary);padding:4px 12px;border-radius:20px;font-size:12px;">
       ${escHtml(d)}${count > 0 ? `<span style="opacity:.7;font-size:10px">(${count})</span>` : ''}
       <button onclick="removeDept('${escHtml(d)}')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;line-height:1;padding:0" title="删除">×</button>
     </span>`;
