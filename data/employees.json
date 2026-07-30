@@ -322,20 +322,19 @@
     "id": "8988ca73-1c09-4d60-8381-836dcf853c65",
     "name": "张仪心",
     "gender": "女",
-    "birth_date": "2003-07",
     "department": "焊高组",
     "position": "运营",
+    "birth_date": "2003-07",
     "hire_date": "2026-06",
     "strengths": "",
     "weaknesses": "",
-    "previous_job": "",
+    "previous_job": "无工作经验",
     "personality": "",
     "remarks": "交流较少",
     "employment_type": "未转正",
     "created_by": "Celeste",
-    "created_by_id": "4d602b71-bdbd-408a-b2c5-005d7afeae34",
     "created_at": "2026-07-28T03:59:21.779Z",
-    "updated_at": "2026-07-28T08:02:11.025Z"
+    "updated_at": "2026-07-30T02:42:38.235Z"
   },
   {
     "id": "5f7aefc4-1625-492f-91aa-925532772f7c",
