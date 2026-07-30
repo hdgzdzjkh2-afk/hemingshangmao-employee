@@ -580,9 +580,9 @@
     "previous_job": "",
     "personality": "",
     "remarks": "离职原因：发生意外需住院观察",
-    "employment_type": "",
+    "employment_type": "已离职",
     "created_by": "系统用户",
     "created_at": "2026-07-30T01:28:18.998Z",
-    "updated_at": "2026-07-30T01:28:18.998Z"
+    "updated_at": "2026-07-30T01:28:29.916Z"
   }
 ]
