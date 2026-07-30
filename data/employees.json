@@ -285,20 +285,19 @@
     "id": "2149da81-a2f2-4f1c-bb8f-2ff3b654186d",
     "name": "关媛博",
     "gender": "女",
-    "birth_date": "2005-01",
     "department": "风靡组",
     "position": "运营",
+    "birth_date": "2005-01",
     "hire_date": "2026-06",
     "strengths": "",
     "weaknesses": "",
-    "previous_job": "",
+    "previous_job": "无工作经验",
     "personality": "",
     "remarks": "工作不够细心，但也努力",
     "employment_type": "未转正",
     "created_by": "Celeste",
-    "created_by_id": "4d602b71-bdbd-408a-b2c5-005d7afeae34",
     "created_at": "2026-07-28T03:57:02.364Z",
-    "updated_at": "2026-07-28T08:24:07.979Z"
+    "updated_at": "2026-07-30T02:42:32.323Z"
   },
   {
     "id": "99e43e7d-e326-499a-b751-0e3269e0e638",
