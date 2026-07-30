@@ -692,5 +692,23 @@
     "created_by": "系统用户",
     "created_at": "2026-07-30T01:56:24.239Z",
     "updated_at": "2026-07-30T01:56:24.239Z"
+  },
+  {
+    "id": "e_1785377367320_k94z4f",
+    "name": "张珍珍",
+    "gender": "女",
+    "department": "鸿鹄组",
+    "position": "运营",
+    "birth_date": "2002-10",
+    "hire_date": "2026-05",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "淘汰原因：工作不认真，注意力不集中",
+    "employment_type": "已淘汰",
+    "created_by": "系统用户",
+    "created_at": "2026-07-30T02:09:27.320Z",
+    "updated_at": "2026-07-30T02:09:27.320Z"
   }
 ]
