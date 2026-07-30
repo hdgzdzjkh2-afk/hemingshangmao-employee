@@ -584,5 +584,23 @@
     "created_by": "系统用户",
     "created_at": "2026-07-30T01:28:18.998Z",
     "updated_at": "2026-07-30T01:28:29.916Z"
+  },
+  {
+    "id": "e_1785374978364_ehewed",
+    "name": "张智钫",
+    "gender": "男",
+    "department": "无言组",
+    "position": "运营",
+    "birth_date": "2004-08",
+    "hire_date": "2026-01",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "离职原因：另有安排",
+    "employment_type": "已离职",
+    "created_by": "系统用户",
+    "created_at": "2026-07-30T01:29:38.364Z",
+    "updated_at": "2026-07-30T01:29:38.364Z"
   }
 ]
