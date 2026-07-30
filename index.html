@@ -157,6 +157,7 @@ tbody tr:hover{background:#f8fafc}
       </div>
       <select id="deptFilter"><option value="">全部部门</option></select>
       <button class="btn btn-outline filter-toggle" onclick="toggleFilter()">🔽 筛选 <span class="filter-count" id="filterCount"></span></button>
+      <button class="btn btn-outline" onclick="toggleDeptPanel()">📁 管理部门</button>
       <button class="btn btn-primary" onclick="openAddModal()">+ 添加员工</button>
     </div>
     <div class="filter-panel" id="filterPanel">
@@ -167,6 +168,18 @@ tbody tr:hover{background:#f8fafc}
         <div class="fg"><label>员工类型</label><select id="filt_emp_type"><option value="">全部</option><option value="已转正">已转正</option><option value="未转正">未转正</option><option value="已离职">已离职</option><option value="已淘汰">已淘汰</option></select></div>
         <div class="filter-actions"><button class="btn btn-sm btn-primary" onclick="applyFilters()">筛选</button><button class="btn btn-sm" onclick="resetFilters()">重置</button></div>
       </div>
+    </div>
+    <div class="filter-panel" id="deptPanel">
+      <div class="filter-row">
+        <div class="fg" style="min-width:200px">
+          <label>新增部门</label>
+          <div style="display:flex;gap:6px">
+            <input id="newDeptInput" placeholder="输入新部门名称" style="flex:1" onkeydown="if(event.key==='Enter')addDept()">
+            <button class="btn btn-sm btn-primary" onclick="addDept()">添加</button>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px" id="deptTagList"></div>
     </div>
     <div class="table-wrap">
       <div class="table-hdr"><h3>员工列表</h3><span style="font-size:12px;color:var(--text3)" id="listCount"></span></div>
@@ -230,6 +243,7 @@ const GITHUB_TOKEN = ['ghp','_Bpb7TenvR','Jh0u9f7C6eHxqI7D','IwgsJ0qaxzD'].join(
 const BRANCH = 'master';
 const DATA_PATH = 'data/employees.json';
 const CONFIG_PATH = 'data/config.json';
+const DEPTS_PATH = 'data/departments.json';
 
 const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${BRANCH}`;
 const API_URL = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents`;
@@ -238,6 +252,8 @@ const API_URL = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/cont
 let employees = [];
 let config = { password: 'HMSMAMZ' };
 let employeesSha = '';
+let departments = [];
+let deptsSha = '';
 let loggedIn = false;
 let editingId = null;
 let detailId = null;
@@ -278,6 +294,61 @@ async function ghPut(path, content, sha, msg) {
   return d.content.sha;
 }
 
+// ====== DEPARTMENTS ======
+async function loadDepts() {
+  try {
+    const res = await fetch(`${API_URL}/${DEPTS_PATH}?ref=${BRANCH}`, {
+      headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}` }
+    });
+    if (!res.ok) { departments = []; deptsSha = ''; return; }
+    const info = await res.json();
+    deptsSha = info.sha;
+    departments = JSON.parse(decodeURIComponent(escape(atob(info.content))));
+    if (!Array.isArray(departments)) departments = [];
+  } catch(e) { departments = []; }
+}
+
+async function saveDepts() {
+  try {
+    const body = { message: '更新部门列表', content: btoa(unescape(encodeURIComponent(JSON.stringify(departments,null,2)))), branch: BRANCH };
+    if (deptsSha) body.sha = deptsSha;
+    const res = await fetch(`${API_URL}/${DEPTS_PATH}`, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error('保存部门失败');
+    const d = await res.json();
+    deptsSha = d.content.sha;
+  } catch(e) { toast('保存部门失败: '+e.message, 'error'); throw e; }
+}
+
+async function addDept() {
+  const name = document.getElementById('newDeptInput').value.trim();
+  if (!name) return toast('请输入部门名称', 'error');
+  if (departments.includes(name)) return toast('该部门已存在', 'error');
+  departments.push(name);
+  departments.sort();
+  await saveDepts();
+  document.getElementById('newDeptInput').value = '';
+  toast('部门已添加', 'success');
+  render();
+}
+
+async function removeDept(name) {
+  if (!confirm(`确定要删除部门「${name}」吗？`)) return;
+  departments = departments.filter(d => d !== name);
+  await saveDepts();
+  toast('部门已删除', 'success');
+  render();
+}
+
+function getAllDepts() {
+  // Merge managed departments + departments found in employees
+  const empDepts = employees.map(e=>e.department).filter(Boolean);
+  return [...new Set([...departments, ...empDepts])].sort();
+}
+
 // ====== AUTH ======
 async function loadConfig() {
   try {
@@ -294,6 +365,7 @@ async function doLogin() {
     document.getElementById('app').classList.add('active');
     document.getElementById('loginUser').textContent = '在线';
     loadData();
+    loadDepts();
   } else {
     toast('密码错误', 'error');
   }
@@ -405,7 +477,7 @@ function render() {
   `;
 
   // Dept filter
-  const depts = [...new Set(employees.map(e=>e.department).filter(Boolean))].sort();
+  const depts = getAllDepts();
   const df = document.getElementById('deptFilter');
   const curDept = df.value;
   df.innerHTML = '<option value="">全部部门</option>'+depts.map(d=>`<option value="${escHtml(d)}" ${d===curDept?'selected':''}>${escHtml(d)}</option>`).join('');
@@ -439,6 +511,23 @@ function render() {
   `).join('');
 
   document.getElementById('tableFooter').textContent = `最后更新: ${new Date().toLocaleString('zh-CN')}`;
+  renderDeptTags();
+}
+
+function renderDeptTags() {
+  if (!document.getElementById('deptPanel').classList.contains('open')) return;
+  const list = getAllDepts();
+  const el = document.getElementById('deptTagList');
+  if (departments.length === 0) {
+    el.innerHTML = '<span style="font-size:12px;color:var(--text3)">暂无预设部门，部门将从员工档案中自动提取</span>';
+    return;
+  }
+  el.innerHTML = departments.map(d => `
+    <span style="display:inline-flex;align-items:center;gap:4px;background:#eef2ff;color:var(--primary);padding:4px 12px;border-radius:20px;font-size:12px;">
+      ${escHtml(d)}
+      <button onclick="removeDept('${escHtml(d)}')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;line-height:1;padding:0" title="删除">×</button>
+    </span>
+  `).join('');
 }
 
 // ====== HIRE SORT ======
@@ -455,6 +544,7 @@ function toggleHireSort() {
 
 // ====== FILTERS ======
 function toggleFilter() { document.getElementById('filterPanel').classList.toggle('open'); }
+function toggleDeptPanel() { document.getElementById('deptPanel').classList.toggle('open'); renderDeptTags(); }
 function applyFilters() {
   filters.gender = document.getElementById('filt_gender').value;
   filters.ageMin = document.getElementById('filt_age_min').value;
