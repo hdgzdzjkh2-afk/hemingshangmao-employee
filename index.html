@@ -257,7 +257,7 @@ let deptsSha = '';
 let loggedIn = false;
 let editingId = null;
 let detailId = null;
-let hireSort = null;
+let hireSort = 'desc';
 let filters = { gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'' };
 
 function toast(msg, type='success') {
@@ -522,6 +522,10 @@ function render() {
   `).join('');
 
   document.getElementById('tableFooter').textContent = `最后更新: ${new Date().toLocaleString('zh-CN')}`;
+  const th = document.querySelector('.sortable-th');
+  const icon = document.getElementById('hireSortIcon');
+  if (th) th.classList.toggle('active-sort', hireSort !== null);
+  if (icon) icon.textContent = hireSort === 'desc' ? '↓' : hireSort === 'asc' ? '↑' : '⇅';
   renderDeptTags();
 }
 
