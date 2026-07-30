@@ -710,5 +710,23 @@
     "created_by": "系统用户",
     "created_at": "2026-07-30T02:09:27.320Z",
     "updated_at": "2026-07-30T02:09:27.320Z"
+  },
+  {
+    "id": "e_1785377560500_3oy8n6",
+    "name": "宋佳音",
+    "gender": "女",
+    "department": "无言组",
+    "position": "运营",
+    "birth_date": "2004-10",
+    "hire_date": "2026-06",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "淘汰原因：写链接过于依赖AI，提醒后仍无改善",
+    "employment_type": "已淘汰",
+    "created_by": "系统用户",
+    "created_at": "2026-07-30T02:12:40.500Z",
+    "updated_at": "2026-07-30T02:12:40.500Z"
   }
 ]
