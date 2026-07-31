@@ -189,20 +189,19 @@
     "id": "bf23898e-bfd3-4af1-80b6-e35e0bdd0d53",
     "name": "郑琰潇",
     "gender": "男",
-    "birth_date": "1995-05",
     "department": "Bommy组",
     "position": "运营",
+    "birth_date": "1995-05",
     "hire_date": "2026-04",
     "strengths": "",
     "weaknesses": "",
-    "previous_job": "",
+    "previous_job": "医药销售代表",
     "personality": "",
     "remarks": "",
     "employment_type": "已转正",
     "created_by": "Celeste",
-    "created_by_id": "4d602b71-bdbd-408a-b2c5-005d7afeae34",
     "created_at": "2026-07-28T03:50:57.612Z",
-    "updated_at": "2026-07-28T06:44:10.778Z"
+    "updated_at": "2026-07-31T03:44:04.239Z"
   },
   {
     "id": "cf725034-9791-4da9-aacb-d5809518de1b",
