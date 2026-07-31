@@ -186,8 +186,8 @@ tbody tr:hover{background:#f8fafc}
       <div style="overflow-x:auto">
         <table>
           <thead><tr>
-            <th>姓名</th><th>性别</th><th>部门</th><th>职位</th><th>类型</th><th>出生年月</th><th>年龄</th>
-            <th class="sortable-th" onclick="toggleHireSort()" title="点击排序">入职时间 <span class="sort-icon" id="hireSortIcon">⇅</span></th><th>上一份工作</th><th>备注</th><th>操作</th>
+            <th>姓名</th><th>性别</th><th>部门</th><th>职位</th><th>类型</th><th>出生年月</th><th class="sortable-th" id="ageSortTh" onclick="toggleAgeSort()" title="点击排序">年龄 <span class="sort-icon" id="ageSortIcon">⇅</span></th>
+            <th class="sortable-th" id="hireSortTh" onclick="toggleHireSort()" title="点击排序">入职时间 <span class="sort-icon" id="hireSortIcon">⇅</span></th><th>上一份工作</th><th>备注</th><th>操作</th>
           </tr></thead>
           <tbody id="tableBody"></tbody>
         </table>
@@ -258,6 +258,7 @@ let loggedIn = false;
 let editingId = null;
 let detailId = null;
 let hireSort = 'desc';
+let ageSort = null;
 let filters = { gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'' };
 
 function toast(msg, type='success') {
@@ -457,6 +458,8 @@ function render() {
   // Sorting
   if (hireSort === 'desc') list.sort((a,b) => (b.hire_date||'').localeCompare(a.hire_date||''));
   else if (hireSort === 'asc') list.sort((a,b) => (a.hire_date||'').localeCompare(b.hire_date||''));
+  if (ageSort === 'desc') list.sort((a,b) => (calcAgeRaw(b.birth_date)||-1) - (calcAgeRaw(a.birth_date)||-1));
+  else if (ageSort === 'asc') list.sort((a,b) => (calcAgeRaw(a.birth_date)||999) - (calcAgeRaw(b.birth_date)||999));
 
   // Search & Dept filter
   if (search) list = list.filter(e => e.name.toLowerCase().includes(search)||e.position.toLowerCase().includes(search)||e.department.toLowerCase().includes(search));
@@ -522,10 +525,14 @@ function render() {
   `).join('');
 
   document.getElementById('tableFooter').textContent = `最后更新: ${new Date().toLocaleString('zh-CN')}`;
-  const th = document.querySelector('.sortable-th');
-  const icon = document.getElementById('hireSortIcon');
-  if (th) th.classList.toggle('active-sort', hireSort !== null);
-  if (icon) icon.textContent = hireSort === 'desc' ? '↓' : hireSort === 'asc' ? '↑' : '⇅';
+  const hTh = document.getElementById('hireSortTh');
+  const hIcon = document.getElementById('hireSortIcon');
+  if (hTh) hTh.classList.toggle('active-sort', hireSort !== null);
+  if (hIcon) hIcon.textContent = hireSort === 'desc' ? '↓' : hireSort === 'asc' ? '↑' : '⇅';
+  const aTh = document.getElementById('ageSortTh');
+  const aIcon = document.getElementById('ageSortIcon');
+  if (aTh) aTh.classList.toggle('active-sort', ageSort !== null);
+  if (aIcon) aIcon.textContent = ageSort === 'desc' ? '↓' : ageSort === 'asc' ? '↑' : '⇅';
   renderDeptTags();
 }
 
@@ -552,10 +559,14 @@ function toggleHireSort() {
   if (hireSort === null) hireSort = 'desc';
   else if (hireSort === 'desc') hireSort = 'asc';
   else hireSort = null;
-  const th = document.querySelector('.sortable-th');
-  const icon = document.getElementById('hireSortIcon');
-  th.classList.toggle('active-sort', hireSort !== null);
-  icon.textContent = hireSort === 'desc' ? '↓' : hireSort === 'asc' ? '↑' : '⇅';
+  render();
+}
+
+// ====== AGE SORT ======
+function toggleAgeSort() {
+  if (ageSort === null) ageSort = 'desc';
+  else if (ageSort === 'desc') ageSort = 'asc';
+  else ageSort = null;
   render();
 }
 
