@@ -296,20 +296,19 @@
     "id": "99e43e7d-e326-499a-b751-0e3269e0e638",
     "name": "李汝浩",
     "gender": "男",
-    "birth_date": "1995-03",
     "department": "风靡组",
     "position": "运营",
+    "birth_date": "1995-03",
     "hire_date": "2026-03",
     "strengths": "有亚马逊运营经验（跟卖）",
     "weaknesses": "胆小",
     "previous_job": "大北农集团公司-运营",
     "personality": "好相处",
-    "remarks": "会自己钻研分析问题，有上进心",
+    "remarks": "会自己钻研分析问题，努力",
     "employment_type": "已转正",
     "created_by": "Celeste",
-    "created_by_id": "4d602b71-bdbd-408a-b2c5-005d7afeae34",
     "created_at": "2026-07-28T03:57:32.710Z",
-    "updated_at": "2026-07-28T08:30:41.573Z"
+    "updated_at": "2026-08-01T00:26:02.174Z"
   },
   {
     "id": "8988ca73-1c09-4d60-8381-836dcf853c65",
