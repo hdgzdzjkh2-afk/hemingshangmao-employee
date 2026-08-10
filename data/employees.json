@@ -747,5 +747,23 @@
     "created_by": "系统用户",
     "created_at": "2026-07-30T02:16:12.777Z",
     "updated_at": "2026-07-30T02:51:18.939Z"
+  },
+  {
+    "id": "e_1786323700106_blqnvp",
+    "name": "陈世豪",
+    "gender": "",
+    "department": "无言组",
+    "position": "",
+    "birth_date": "2006-09",
+    "hire_date": "2026-08",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "上海安保-巡逻",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "未转正",
+    "created_by": "系统用户",
+    "created_at": "2026-08-10T01:01:40.106Z",
+    "updated_at": "2026-08-10T01:01:40.106Z"
   }
 ]
