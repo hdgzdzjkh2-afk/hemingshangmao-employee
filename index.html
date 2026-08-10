@@ -29,7 +29,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .topbar-right{display:flex;align-items:center;gap:12px}
 .user-name{font-size:13px;font-weight:500}
 .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:20px 24px}
-.stat-card{background:var(--card);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .15s,box-shadow .15s,outline .15s;outline:2px solid transparent;user-select:none}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.stat-card:active{transform:translateY(0)}
+.stat-card.stat-active{outline-color:var(--primary);background:#eef2ff}
 .stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
 .stat-num{font-size:22px;font-weight:700;line-height:1.2}
 .stat-label{font-size:11px;color:var(--text3)}
@@ -481,13 +484,13 @@ function render() {
   const resigned = list.filter(e=>e.employment_type==='已离职').length;
   const terminated = list.filter(e=>e.employment_type==='已淘汰').length;
   document.getElementById('statsRow').innerHTML = `
-    <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">👥</div><div><div class="stat-num">${list.length}</div><div class="stat-label">员工总数</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">♂</div><div><div class="stat-num">${male}</div><div class="stat-label">男生</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#fce7f3;color:#db2777">♀</div><div><div class="stat-num">${female}</div><div class="stat-label">女生</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#16a34a">💼</div><div><div class="stat-num">${regular}</div><div class="stat-label">已转正</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#fef9c3;color:#ca8a04">⏳</div><div><div class="stat-num">${probation}</div><div class="stat-label">未转正</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#f1f5f9;color:#64748b">🚪</div><div><div class="stat-num">${resigned}</div><div class="stat-label">已离职</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#fef2f2;color:#ef4444">❌</div><div><div class="stat-num">${terminated}</div><div class="stat-label">已淘汰</div></div></div>
+    <div class="stat-card ${(!filters.gender && !filters.empType)?'stat-active':''}" onclick="filterByStat('all')" title="点击查看全部"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">👥</div><div><div class="stat-num">${list.length}</div><div class="stat-label">员工总数</div></div></div>
+    <div class="stat-card ${filters.gender==='男'?'stat-active':''}" onclick="filterByStat('male')" title="点击只看男生"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">♂</div><div><div class="stat-num">${male}</div><div class="stat-label">男生</div></div></div>
+    <div class="stat-card ${filters.gender==='女'?'stat-active':''}" onclick="filterByStat('female')" title="点击只看女生"><div class="stat-icon" style="background:#fce7f3;color:#db2777">♀</div><div><div class="stat-num">${female}</div><div class="stat-label">女生</div></div></div>
+    <div class="stat-card ${filters.empType==='已转正'?'stat-active':''}" onclick="filterByStat('regular')" title="点击只看已转正"><div class="stat-icon" style="background:#dcfce7;color:#16a34a">💼</div><div><div class="stat-num">${regular}</div><div class="stat-label">已转正</div></div></div>
+    <div class="stat-card ${filters.empType==='未转正'?'stat-active':''}" onclick="filterByStat('probation')" title="点击只看未转正"><div class="stat-icon" style="background:#fef9c3;color:#ca8a04">⏳</div><div><div class="stat-num">${probation}</div><div class="stat-label">未转正</div></div></div>
+    <div class="stat-card ${filters.empType==='已离职'?'stat-active':''}" onclick="filterByStat('resigned')" title="点击只看已离职"><div class="stat-icon" style="background:#f1f5f9;color:#64748b">🚪</div><div><div class="stat-num">${resigned}</div><div class="stat-label">已离职</div></div></div>
+    <div class="stat-card ${filters.empType==='已淘汰'?'stat-active':''}" onclick="filterByStat('terminated')" title="点击只看已淘汰"><div class="stat-icon" style="background:#fef2f2;color:#ef4444">❌</div><div><div class="stat-num">${terminated}</div><div class="stat-label">已淘汰</div></div></div>
   `;
 
   // Dept filter
@@ -590,6 +593,39 @@ function resetFilters() {
   filters = { gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'' };
   ['filt_gender','filt_age_min','filt_age_max','filt_hire_from','filt_hire_to','filt_emp_type'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('filterCount').classList.remove('active');
+  render();
+}
+
+// ====== STAT CARD FILTER ======
+function filterByStat(type) {
+  const prev = { gender: filters.gender, empType: filters.empType };
+  if (type === 'all') {
+    filters.gender = ''; filters.empType = '';
+  } else if (type === 'male') {
+    filters.gender = (filters.gender === '男') ? '' : '男';
+    filters.empType = '';
+  } else if (type === 'female') {
+    filters.gender = (filters.gender === '女') ? '' : '女';
+    filters.empType = '';
+  } else if (type === 'regular') {
+    filters.empType = (filters.empType === '已转正') ? '' : '已转正';
+    filters.gender = '';
+  } else if (type === 'probation') {
+    filters.empType = (filters.empType === '未转正') ? '' : '未转正';
+    filters.gender = '';
+  } else if (type === 'resigned') {
+    filters.empType = (filters.empType === '已离职') ? '' : '已离职';
+    filters.gender = '';
+  } else if (type === 'terminated') {
+    filters.empType = (filters.empType === '已淘汰') ? '' : '已淘汰';
+    filters.gender = '';
+  }
+  document.getElementById('filt_gender').value = filters.gender;
+  document.getElementById('filt_emp_type').value = filters.empType;
+  const active = Object.values(filters).filter(v=>v).length;
+  const badge = document.getElementById('filterCount');
+  if (active) { badge.textContent = active; badge.classList.add('active'); }
+  else badge.classList.remove('active');
   render();
 }
 
