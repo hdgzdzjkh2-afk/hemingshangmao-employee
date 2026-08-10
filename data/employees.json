@@ -751,9 +751,9 @@
   {
     "id": "e_1786323700106_blqnvp",
     "name": "陈世豪",
-    "gender": "",
+    "gender": "男",
     "department": "无言组",
-    "position": "",
+    "position": "运营",
     "birth_date": "2006-09",
     "hire_date": "2026-08",
     "strengths": "",
@@ -764,7 +764,7 @@
     "employment_type": "未转正",
     "created_by": "系统用户",
     "created_at": "2026-08-10T01:01:40.106Z",
-    "updated_at": "2026-08-10T01:01:40.106Z"
+    "updated_at": "2026-08-10T01:04:08.609Z"
   },
   {
     "id": "e_1786323841066_pjzu4z",
