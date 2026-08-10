@@ -801,5 +801,23 @@
     "created_by": "系统用户",
     "created_at": "2026-08-10T01:05:49.081Z",
     "updated_at": "2026-08-10T01:05:49.081Z"
+  },
+  {
+    "id": "e_1786324024536_xo6dds",
+    "name": "郭雪鹏",
+    "gender": "女",
+    "department": "Drama组",
+    "position": "运营",
+    "birth_date": "2003-08",
+    "hire_date": "2026-08",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "手机店临促",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "未转正",
+    "created_by": "系统用户",
+    "created_at": "2026-08-10T01:07:04.536Z",
+    "updated_at": "2026-08-10T01:07:04.536Z"
   }
 ]
