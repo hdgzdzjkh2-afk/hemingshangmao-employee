@@ -819,5 +819,23 @@
     "created_by": "系统用户",
     "created_at": "2026-08-10T01:07:04.536Z",
     "updated_at": "2026-08-10T01:07:04.536Z"
+  },
+  {
+    "id": "e_1786324154417_6ndwy7",
+    "name": "高程",
+    "gender": "男",
+    "department": "鸿鹄组",
+    "position": "运营",
+    "birth_date": "2004-08",
+    "hire_date": "2026-08",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "汝州市京东快递-快递员",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "未转正",
+    "created_by": "系统用户",
+    "created_at": "2026-08-10T01:09:14.417Z",
+    "updated_at": "2026-08-10T01:09:14.417Z"
   }
 ]
