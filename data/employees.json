@@ -976,5 +976,23 @@
     "created_by": "系统用户",
     "created_at": "2026-09-03T09:32:54.137Z",
     "updated_at": "2026-09-03T09:32:54.137Z"
+  },
+  {
+    "id": "e_1788428013712_5nbtx9",
+    "name": "怯梦妍",
+    "gender": "",
+    "department": "Drama组",
+    "position": "组长",
+    "birth_date": "1998-05",
+    "hire_date": "2023-12",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "已转正",
+    "created_by": "系统用户",
+    "created_at": "2026-09-03T09:33:33.712Z",
+    "updated_at": "2026-09-03T09:33:33.712Z"
   }
 ]
