@@ -886,5 +886,23 @@
     "created_by": "系统用户",
     "created_at": "2026-09-03T09:24:43.672Z",
     "updated_at": "2026-09-03T09:24:43.672Z"
+  },
+  {
+    "id": "e_1788427627271_8dsmvd",
+    "name": "郭梦楚",
+    "gender": "男",
+    "department": "智趣组",
+    "position": "组长",
+    "birth_date": "1996-02",
+    "hire_date": "2024-01",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "已转正",
+    "created_by": "系统用户",
+    "created_at": "2026-09-03T09:27:07.271Z",
+    "updated_at": "2026-09-03T09:27:07.271Z"
   }
 ]
