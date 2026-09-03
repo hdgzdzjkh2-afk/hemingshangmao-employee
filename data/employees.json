@@ -904,5 +904,23 @@
     "created_by": "系统用户",
     "created_at": "2026-09-03T09:27:07.271Z",
     "updated_at": "2026-09-03T09:27:07.271Z"
+  },
+  {
+    "id": "e_1788427699290_33yhcn",
+    "name": "彭美茜",
+    "gender": "女",
+    "department": "智趣组",
+    "position": "运营",
+    "birth_date": "2000-09",
+    "hire_date": "2025-02",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "已转正",
+    "created_by": "系统用户",
+    "created_at": "2026-09-03T09:28:19.290Z",
+    "updated_at": "2026-09-03T09:28:19.290Z"
   }
 ]
