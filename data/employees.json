@@ -994,5 +994,23 @@
     "created_by": "系统用户",
     "created_at": "2026-09-03T09:33:33.712Z",
     "updated_at": "2026-09-03T09:33:49.192Z"
+  },
+  {
+    "id": "e_1788428081882_8t46ex",
+    "name": "王然",
+    "gender": "",
+    "department": "Drama组",
+    "position": "运营",
+    "birth_date": "2000-04",
+    "hire_date": "2024-11",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "已转正",
+    "created_by": "系统用户",
+    "created_at": "2026-09-03T09:34:41.882Z",
+    "updated_at": "2026-09-03T09:34:41.882Z"
   }
 ]
