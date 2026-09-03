@@ -922,5 +922,23 @@
     "created_by": "系统用户",
     "created_at": "2026-09-03T09:28:19.290Z",
     "updated_at": "2026-09-03T09:28:19.290Z"
+  },
+  {
+    "id": "e_1788427876129_8rodsj",
+    "name": "陈彦旭",
+    "gender": "男",
+    "department": "智趣组",
+    "position": "储备组长",
+    "birth_date": "1997-03",
+    "hire_date": "2025-04",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "已转正",
+    "created_by": "系统用户",
+    "created_at": "2026-09-03T09:31:16.129Z",
+    "updated_at": "2026-09-03T09:31:16.129Z"
   }
 ]
