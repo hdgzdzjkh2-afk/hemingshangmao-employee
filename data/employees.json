@@ -1228,5 +1228,23 @@
     "created_by": "系统用户",
     "created_at": "2026-09-03T09:45:09.369Z",
     "updated_at": "2026-09-03T09:45:09.369Z"
+  },
+  {
+    "id": "e_1788428751001_4ubgv2",
+    "name": "马晓驹",
+    "gender": "男",
+    "department": "晨曦组",
+    "position": "组长",
+    "birth_date": "1990-02",
+    "hire_date": "2025-01",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "已转正",
+    "created_by": "系统用户",
+    "created_at": "2026-09-03T09:45:51.001Z",
+    "updated_at": "2026-09-03T09:45:51.001Z"
   }
 ]
