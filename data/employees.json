@@ -868,5 +868,23 @@
     "created_by": "系统用户",
     "created_at": "2026-09-03T09:23:47.138Z",
     "updated_at": "2026-09-03T09:23:47.138Z"
+  },
+  {
+    "id": "e_1788427483672_z7bi7t",
+    "name": "王佳鑫",
+    "gender": "女",
+    "department": "总经办",
+    "position": "副总经理",
+    "birth_date": "1999-10",
+    "hire_date": "2024-03",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "已转正",
+    "created_by": "系统用户",
+    "created_at": "2026-09-03T09:24:43.672Z",
+    "updated_at": "2026-09-03T09:24:43.672Z"
   }
 ]
