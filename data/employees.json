@@ -832,5 +832,23 @@
     "created_by": "系统用户",
     "created_at": "2026-08-10T01:09:14.417Z",
     "updated_at": "2026-08-10T01:12:38.177Z"
+  },
+  {
+    "id": "e_1788427344097_51pk01",
+    "name": "常佳恒",
+    "gender": "男",
+    "department": "总经办",
+    "position": "总经理",
+    "birth_date": "1997-01",
+    "hire_date": "2022-03",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "已转正",
+    "created_by": "系统用户",
+    "created_at": "2026-09-03T09:22:24.097Z",
+    "updated_at": "2026-09-03T09:22:24.097Z"
   }
 ]
