@@ -1192,5 +1192,23 @@
     "created_by": "系统用户",
     "created_at": "2026-09-03T09:43:37.803Z",
     "updated_at": "2026-09-03T09:43:37.803Z"
+  },
+  {
+    "id": "e_1788428659906_qkcrkz",
+    "name": "黄雪可",
+    "gender": "女",
+    "department": "鸿鹄组",
+    "position": "组长",
+    "birth_date": "1992-03",
+    "hire_date": "2024-11",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "已转正",
+    "created_by": "系统用户",
+    "created_at": "2026-09-03T09:44:19.906Z",
+    "updated_at": "2026-09-03T09:44:19.906Z"
   }
 ]
