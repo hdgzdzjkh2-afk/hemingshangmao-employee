@@ -1317,5 +1317,23 @@
     "created_by": "系统用户",
     "created_at": "2026-09-19T03:01:01.822Z",
     "updated_at": "2026-09-19T03:01:01.822Z"
+  },
+  {
+    "id": "e_1789786925150_1908md",
+    "name": "杨帅鹏",
+    "gender": "男",
+    "department": "风靡组",
+    "position": "运营",
+    "birth_date": "2000-01",
+    "hire_date": "2026-09",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "初中数学教师",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "未转正",
+    "created_by": "系统用户",
+    "created_at": "2026-09-19T03:02:05.150Z",
+    "updated_at": "2026-09-19T03:02:05.150Z"
   }
 ]
