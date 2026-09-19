@@ -1299,5 +1299,23 @@
     "created_by": "系统用户",
     "created_at": "2026-09-19T03:00:12.006Z",
     "updated_at": "2026-09-19T03:00:12.006Z"
+  },
+  {
+    "id": "e_1789786861822_ld5pnl",
+    "name": "王怡萌",
+    "gender": "女",
+    "department": "风靡组",
+    "position": "运营",
+    "birth_date": "2006-07",
+    "hire_date": "2026-09",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "无工作经验",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "未转正",
+    "created_by": "系统用户",
+    "created_at": "2026-09-19T03:01:01.822Z",
+    "updated_at": "2026-09-19T03:01:01.822Z"
   }
 ]
