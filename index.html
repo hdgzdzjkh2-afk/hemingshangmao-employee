@@ -37,6 +37,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .stat-num{font-size:22px;font-weight:700;line-height:1.2}
 .stat-label{font-size:11px;color:var(--text3)}
 .stat-pct{font-size:10px;color:var(--text3);margin-left:4px;opacity:.75;font-weight:400}
+.stat-group-title{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--text3);margin-top:2px}
+.stat-group-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.stat-group-title span{white-space:nowrap}
 .content{padding:0 24px 24px;flex:1}
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
 .search-box{flex:1;min-width:160px;position:relative}
@@ -263,7 +266,7 @@ let editingId = null;
 let detailId = null;
 let hireSort = 'desc';
 let ageSort = null;
-let filters = { gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'' };
+let filters = { gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'', activeOnly:true };
 
 function toast(msg, type='success') {
   const t = document.getElementById('toast');
@@ -476,28 +479,42 @@ function render() {
   if (filters.ageMax) list = list.filter(e => { const a = calcAgeRaw(e.birth_date); return !isNaN(a) && a <= parseInt(filters.ageMax); });
   if (filters.hireFrom) list = list.filter(e => e.hire_date && e.hire_date >= filters.hireFrom);
   if (filters.hireTo) list = list.filter(e => e.hire_date && e.hire_date <= filters.hireTo);
+  if (filters.activeOnly && !filters.empType) list = list.filter(e => e.employment_type!=='已离职' && e.employment_type!=='已淘汰');
 
-  // Stats (based on filtered list)
-  const total = employees.length || 1;
-  const pct = n => total > 0 ? (n * 100 / total).toFixed(1) + '%' : '';
-  const male = list.filter(e=>e.gender==='男').length;
-  const female = list.filter(e=>e.gender==='女').length;
-  const regular = list.filter(e=>e.employment_type==='已转正').length;
-  const probation = list.filter(e=>e.employment_type==='未转正').length;
-  const resigned = list.filter(e=>e.employment_type==='已离职').length;
-  const terminated = list.filter(e=>e.employment_type==='已淘汰').length;
-  const active = list.filter(e=>e.employment_type!=='已离职' && e.employment_type!=='已淘汰').length;
-  const ages = list.map(e=>calcAgeRaw(e.birth_date)).filter(a=>!isNaN(a));
+  // Stats: 基于「不含性别/类型筛选」的结果，这样点击卡片筛选时其它卡片不会塌陷
+  const isLeft = e => e.employment_type === '已离职' || e.employment_type === '已淘汰';
+  const statList = (() => {
+    let l = [...employees];
+    if (search) l = l.filter(e => e.name.toLowerCase().includes(search)||e.position.toLowerCase().includes(search)||e.department.toLowerCase().includes(search));
+    if (dept) l = l.filter(e => e.department === dept);
+    if (filters.ageMin) l = l.filter(e => { const a = calcAgeRaw(e.birth_date); return !isNaN(a) && a >= parseInt(filters.ageMin); });
+    if (filters.ageMax) l = l.filter(e => { const a = calcAgeRaw(e.birth_date); return !isNaN(a) && a <= parseInt(filters.ageMax); });
+    if (filters.hireFrom) l = l.filter(e => e.hire_date && e.hire_date >= filters.hireFrom);
+    if (filters.hireTo) l = l.filter(e => e.hire_date && e.hire_date <= filters.hireTo);
+    return l;
+  })();
+  const activeList = statList.filter(e => !isLeft(e));
+  const activeTotal = activeList.length;
+  const pct = n => activeTotal > 0 ? (n * 100 / activeTotal).toFixed(1) + '%' : '';
+  const male = activeList.filter(e=>e.gender==='男').length;
+  const female = activeList.filter(e=>e.gender==='女').length;
+  const regular = activeList.filter(e=>e.employment_type==='已转正').length;
+  const probation = activeList.filter(e=>e.employment_type==='未转正').length;
+  const resigned = statList.filter(e=>e.employment_type==='已离职').length;
+  const terminated = statList.filter(e=>e.employment_type==='已淘汰').length;
+  const ages = activeList.map(e=>calcAgeRaw(e.birth_date)).filter(a=>!isNaN(a));
   const avgAge = ages.length > 0 ? (ages.reduce((s,a)=>s+a,0)/ages.length).toFixed(1) : '-';
   document.getElementById('statsRow').innerHTML = `
-    <div class="stat-card ${(!filters.gender && !filters.empType)?'stat-active':''}" onclick="filterByStat('all')" title="点击查看全部（不含已离职/已淘汰）"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">👥</div><div><div class="stat-num">${active}</div><div class="stat-label">在职员工</div></div></div>
-    <div class="stat-card ${filters.gender==='男'?'stat-active':''}" onclick="filterByStat('male')" title="点击只看男生"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">♂</div><div><div class="stat-num">${male}</div><div class="stat-label">男生<span class="stat-pct">${pct(male)}</span></div></div></div>
-    <div class="stat-card ${filters.gender==='女'?'stat-active':''}" onclick="filterByStat('female')" title="点击只看女生"><div class="stat-icon" style="background:#fce7f3;color:#db2777">♀</div><div><div class="stat-num">${female}</div><div class="stat-label">女生<span class="stat-pct">${pct(female)}</span></div></div></div>
+    <div class="stat-group-title"><span>在职</span></div>
+    <div class="stat-card ${filters.activeOnly && !filters.gender && !filters.empType?'stat-active':''}" onclick="filterByStat('all')" title="点击查看全部在职员工"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">👥</div><div><div class="stat-num">${activeTotal}</div><div class="stat-label">在职员工</div></div></div>
+    <div class="stat-card ${filters.gender==='男'?'stat-active':''}" onclick="filterByStat('male')" title="点击只看在职男生"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">♂</div><div><div class="stat-num">${male}</div><div class="stat-label">男生<span class="stat-pct">${pct(male)}</span></div></div></div>
+    <div class="stat-card ${filters.gender==='女'?'stat-active':''}" onclick="filterByStat('female')" title="点击只看在职女生"><div class="stat-icon" style="background:#fce7f3;color:#db2777">♀</div><div><div class="stat-num">${female}</div><div class="stat-label">女生<span class="stat-pct">${pct(female)}</span></div></div></div>
     <div class="stat-card ${filters.empType==='已转正'?'stat-active':''}" onclick="filterByStat('regular')" title="点击只看已转正"><div class="stat-icon" style="background:#dcfce7;color:#16a34a">💼</div><div><div class="stat-num">${regular}</div><div class="stat-label">已转正<span class="stat-pct">${pct(regular)}</span></div></div></div>
     <div class="stat-card ${filters.empType==='未转正'?'stat-active':''}" onclick="filterByStat('probation')" title="点击只看未转正"><div class="stat-icon" style="background:#fef9c3;color:#ca8a04">⏳</div><div><div class="stat-num">${probation}</div><div class="stat-label">未转正<span class="stat-pct">${pct(probation)}</span></div></div></div>
-    <div class="stat-card ${filters.empType==='已离职'?'stat-active':''}" onclick="filterByStat('resigned')" title="点击只看已离职"><div class="stat-icon" style="background:#f1f5f9;color:#64748b">🚪</div><div><div class="stat-num">${resigned}</div><div class="stat-label">已离职<span class="stat-pct">${pct(resigned)}</span></div></div></div>
-    <div class="stat-card ${filters.empType==='已淘汰'?'stat-active':''}" onclick="filterByStat('terminated')" title="点击只看已淘汰"><div class="stat-icon" style="background:#fef2f2;color:#ef4444">❌</div><div><div class="stat-num">${terminated}</div><div class="stat-label">已淘汰<span class="stat-pct">${pct(terminated)}</span></div></div></div>
-    <div class="stat-card" title="筛选后的平均年龄"><div class="stat-icon" style="background:#f3e8ff;color:#9333ea">🎂</div><div><div class="stat-num">${avgAge}</div><div class="stat-label">平均年龄<span class="stat-pct">岁</span></div></div></div>
+    <div class="stat-card" title="在职员工平均年龄"><div class="stat-icon" style="background:#f3e8ff;color:#9333ea">🎂</div><div><div class="stat-num">${avgAge}</div><div class="stat-label">平均年龄<span class="stat-pct">岁</span></div></div></div>
+    <div class="stat-group-title"><span>非在职</span></div>
+    <div class="stat-card ${filters.empType==='已离职'?'stat-active':''}" onclick="filterByStat('resigned')" title="点击只看已离职"><div class="stat-icon" style="background:#f1f5f9;color:#64748b">🚪</div><div><div class="stat-num">${resigned}</div><div class="stat-label">已离职</div></div></div>
+    <div class="stat-card ${filters.empType==='已淘汰'?'stat-active':''}" onclick="filterByStat('terminated')" title="点击只看已淘汰"><div class="stat-icon" style="background:#fef2f2;color:#ef4444">❌</div><div><div class="stat-num">${terminated}</div><div class="stat-label">已淘汰</div></div></div>
   `;
 
   // Dept filter
@@ -590,14 +607,14 @@ function applyFilters() {
   filters.hireFrom = document.getElementById('filt_hire_from').value;
   filters.hireTo = document.getElementById('filt_hire_to').value;
   filters.empType = document.getElementById('filt_emp_type').value;
-  const active = Object.values(filters).filter(v=>v).length;
+  const active = ['gender','ageMin','ageMax','hireFrom','hireTo','empType'].filter(k=>filters[k]).length;
   const badge = document.getElementById('filterCount');
   if (active) { badge.textContent = active; badge.classList.add('active'); }
   else badge.classList.remove('active');
   render();
 }
 function resetFilters() {
-  filters = { gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'' };
+  filters = { gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'', activeOnly:true };
   ['filt_gender','filt_age_min','filt_age_max','filt_hire_from','filt_hire_to','filt_emp_type'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('filterCount').classList.remove('active');
   render();
@@ -607,29 +624,29 @@ function resetFilters() {
 function filterByStat(type) {
   const prev = { gender: filters.gender, empType: filters.empType };
   if (type === 'all') {
-    filters.gender = ''; filters.empType = '';
+    filters.gender = ''; filters.empType = ''; filters.activeOnly = true;
   } else if (type === 'male') {
     filters.gender = (filters.gender === '男') ? '' : '男';
-    filters.empType = '';
+    filters.empType = ''; filters.activeOnly = true;
   } else if (type === 'female') {
     filters.gender = (filters.gender === '女') ? '' : '女';
-    filters.empType = '';
+    filters.empType = ''; filters.activeOnly = true;
   } else if (type === 'regular') {
     filters.empType = (filters.empType === '已转正') ? '' : '已转正';
-    filters.gender = '';
+    filters.gender = ''; filters.activeOnly = true;
   } else if (type === 'probation') {
     filters.empType = (filters.empType === '未转正') ? '' : '未转正';
-    filters.gender = '';
+    filters.gender = ''; filters.activeOnly = true;
   } else if (type === 'resigned') {
     filters.empType = (filters.empType === '已离职') ? '' : '已离职';
-    filters.gender = '';
+    filters.gender = ''; filters.activeOnly = false;
   } else if (type === 'terminated') {
     filters.empType = (filters.empType === '已淘汰') ? '' : '已淘汰';
-    filters.gender = '';
+    filters.gender = ''; filters.activeOnly = false;
   }
   document.getElementById('filt_gender').value = filters.gender;
   document.getElementById('filt_emp_type').value = filters.empType;
-  const active = Object.values(filters).filter(v=>v).length;
+  const active = ['gender','ageMin','ageMax','hireFrom','hireTo','empType'].filter(k=>filters[k]).length;
   const badge = document.getElementById('filterCount');
   if (active) { badge.textContent = active; badge.classList.add('active'); }
   else badge.classList.remove('active');
