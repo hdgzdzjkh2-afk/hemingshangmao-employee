@@ -40,6 +40,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .stat-group-title{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--text3);margin-top:2px}
 .stat-group-title::after{content:'';flex:1;height:1px;background:var(--border)}
 .stat-group-title span{white-space:nowrap}
+.stat-sub{font-size:10px;color:var(--text3);margin-top:3px;opacity:.85}
 .content{padding:0 24px 24px;flex:1}
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
 .search-box{flex:1;min-width:160px;position:relative}
@@ -500,8 +501,18 @@ function render() {
   const female = activeList.filter(e=>e.gender==='女').length;
   const regular = activeList.filter(e=>e.employment_type==='已转正').length;
   const probation = activeList.filter(e=>e.employment_type==='未转正').length;
-  const resigned = statList.filter(e=>e.employment_type==='已离职').length;
-  const terminated = statList.filter(e=>e.employment_type==='已淘汰').length;
+  const resignedList = statList.filter(e=>e.employment_type==='已离职');
+  const terminatedList = statList.filter(e=>e.employment_type==='已淘汰');
+  const grpSub = arr => {
+    if (arr.length === 0) return '暂无数据';
+    const m = arr.filter(e=>e.gender==='男').length;
+    const f = arr.filter(e=>e.gender==='女').length;
+    const ag = arr.map(e=>calcAgeRaw(e.birth_date)).filter(a=>!isNaN(a));
+    const av = ag.length > 0 ? (ag.reduce((s,a)=>s+a,0)/ag.length).toFixed(1) : '-';
+    return `男 ${m} · 女 ${f} · 均龄 ${av}岁`;
+  };
+  const resigned = resignedList.length;
+  const terminated = terminatedList.length;
   const ages = activeList.map(e=>calcAgeRaw(e.birth_date)).filter(a=>!isNaN(a));
   const avgAge = ages.length > 0 ? (ages.reduce((s,a)=>s+a,0)/ages.length).toFixed(1) : '-';
   document.getElementById('statsRow').innerHTML = `
@@ -513,8 +524,8 @@ function render() {
     <div class="stat-card ${filters.empType==='未转正'?'stat-active':''}" onclick="filterByStat('probation')" title="点击只看未转正"><div class="stat-icon" style="background:#fef9c3;color:#ca8a04">⏳</div><div><div class="stat-num">${probation}</div><div class="stat-label">未转正<span class="stat-pct">${pct(probation)}</span></div></div></div>
     <div class="stat-card" title="在职员工平均年龄"><div class="stat-icon" style="background:#f3e8ff;color:#9333ea">🎂</div><div><div class="stat-num">${avgAge}</div><div class="stat-label">平均年龄<span class="stat-pct">岁</span></div></div></div>
     <div class="stat-group-title"><span>非在职</span></div>
-    <div class="stat-card ${filters.empType==='已离职'?'stat-active':''}" onclick="filterByStat('resigned')" title="点击只看已离职"><div class="stat-icon" style="background:#f1f5f9;color:#64748b">🚪</div><div><div class="stat-num">${resigned}</div><div class="stat-label">已离职</div></div></div>
-    <div class="stat-card ${filters.empType==='已淘汰'?'stat-active':''}" onclick="filterByStat('terminated')" title="点击只看已淘汰"><div class="stat-icon" style="background:#fef2f2;color:#ef4444">❌</div><div><div class="stat-num">${terminated}</div><div class="stat-label">已淘汰</div></div></div>
+    <div class="stat-card ${filters.empType==='已离职'?'stat-active':''}" onclick="filterByStat('resigned')" title="点击只看已离职"><div class="stat-icon" style="background:#f1f5f9;color:#64748b">🚪</div><div><div class="stat-num">${resigned}</div><div class="stat-label">已离职</div><div class="stat-sub">${grpSub(resignedList)}</div></div></div>
+    <div class="stat-card ${filters.empType==='已淘汰'?'stat-active':''}" onclick="filterByStat('terminated')" title="点击只看已淘汰"><div class="stat-icon" style="background:#fef2f2;color:#ef4444">❌</div><div><div class="stat-num">${terminated}</div><div class="stat-label">已淘汰</div><div class="stat-sub">${grpSub(terminatedList)}</div></div></div>
   `;
 
   // Dept filter
