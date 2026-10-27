@@ -486,10 +486,11 @@ function render() {
   const probation = list.filter(e=>e.employment_type==='未转正').length;
   const resigned = list.filter(e=>e.employment_type==='已离职').length;
   const terminated = list.filter(e=>e.employment_type==='已淘汰').length;
+  const active = list.filter(e=>e.employment_type!=='已离职' && e.employment_type!=='已淘汰').length;
   const ages = list.map(e=>calcAgeRaw(e.birth_date)).filter(a=>!isNaN(a));
   const avgAge = ages.length > 0 ? (ages.reduce((s,a)=>s+a,0)/ages.length).toFixed(1) : '-';
   document.getElementById('statsRow').innerHTML = `
-    <div class="stat-card ${(!filters.gender && !filters.empType)?'stat-active':''}" onclick="filterByStat('all')" title="点击查看全部"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">👥</div><div><div class="stat-num">${list.length}</div><div class="stat-label">员工总数</div></div></div>
+    <div class="stat-card ${(!filters.gender && !filters.empType)?'stat-active':''}" onclick="filterByStat('all')" title="点击查看全部（不含已离职/已淘汰）"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">👥</div><div><div class="stat-num">${active}</div><div class="stat-label">在职员工</div></div></div>
     <div class="stat-card ${filters.gender==='男'?'stat-active':''}" onclick="filterByStat('male')" title="点击只看男生"><div class="stat-icon" style="background:#dbeafe;color:#2563eb">♂</div><div><div class="stat-num">${male}</div><div class="stat-label">男生<span class="stat-pct">${pct(male)}</span></div></div></div>
     <div class="stat-card ${filters.gender==='女'?'stat-active':''}" onclick="filterByStat('female')" title="点击只看女生"><div class="stat-icon" style="background:#fce7f3;color:#db2777">♀</div><div><div class="stat-num">${female}</div><div class="stat-label">女生<span class="stat-pct">${pct(female)}</span></div></div></div>
     <div class="stat-card ${filters.empType==='已转正'?'stat-active':''}" onclick="filterByStat('regular')" title="点击只看已转正"><div class="stat-icon" style="background:#dcfce7;color:#16a34a">💼</div><div><div class="stat-num">${regular}</div><div class="stat-label">已转正<span class="stat-pct">${pct(regular)}</span></div></div></div>
