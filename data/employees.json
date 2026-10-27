@@ -1459,5 +1459,23 @@
     "created_by": "系统用户",
     "created_at": "2026-10-27T09:48:59.456Z",
     "updated_at": "2026-10-27T09:48:59.456Z"
+  },
+  {
+    "id": "e_1793094597465_a2wpt1",
+    "name": "李旭宁",
+    "gender": "男",
+    "department": "晨曦组",
+    "position": "运营",
+    "birth_date": "2006-12",
+    "hire_date": "2026-10",
+    "strengths": "",
+    "weaknesses": "",
+    "previous_job": "",
+    "personality": "",
+    "remarks": "",
+    "employment_type": "未转正",
+    "created_by": "系统用户",
+    "created_at": "2026-10-27T09:49:57.465Z",
+    "updated_at": "2026-10-27T09:49:57.465Z"
   }
 ]
