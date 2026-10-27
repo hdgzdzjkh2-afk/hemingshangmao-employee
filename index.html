@@ -74,6 +74,8 @@ select,.btn{padding:9px 14px;border:1px solid var(--border);border-radius:8px;fo
 .filter-row .filter-range input{width:80px}
 .filter-actions{display:flex;align-items:flex-end;gap:6px}
 .filter-actions button{padding:7px 14px;border-radius:6px;font-size:12px}
+.filter-result{font-size:12px;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:5px 12px;white-space:nowrap;align-self:center}
+.filter-result b{font-weight:600;font-size:13px}
 .emp-type-tag{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600}
 .emp-type-tag.regular{background:#dcfce7;color:#16a34a}
 .emp-type-tag.probation{background:#fef9c3;color:#ca8a04}
@@ -181,7 +183,7 @@ tbody tr:hover{background:#f8fafc}
         <div class="fg"><label>年龄范围</label><div class="filter-range"><input type="number" id="filt_age_min" placeholder="最小" min="0" max="100"> <span>—</span> <input type="number" id="filt_age_max" placeholder="最大" min="0" max="100"></div></div>
         <div class="fg"><label>入职时间</label><div class="filter-range"><input type="month" id="filt_hire_from"> <span>—</span> <input type="month" id="filt_hire_to"></div></div>
         <div class="fg"><label>员工类型</label><select id="filt_emp_type"><option value="">全部</option><option value="已转正">已转正</option><option value="未转正">未转正</option><option value="已离职">已离职</option><option value="已淘汰">已淘汰</option></select></div>
-        <div class="filter-actions"><button class="btn btn-sm btn-primary" onclick="applyFilters()">筛选</button><button class="btn btn-sm" onclick="resetFilters()">重置</button></div>
+        <div class="filter-actions"><span class="filter-result" id="filterResult"></span><button class="btn btn-sm btn-primary" onclick="applyFilters()">筛选</button><button class="btn btn-sm" onclick="resetFilters()">重置</button></div>
       </div>
     </div>
     <div class="filter-panel" id="deptPanel">
@@ -573,6 +575,9 @@ function render() {
   `).join('');
 
   document.getElementById('tableFooter').textContent = `最后更新: ${new Date().toLocaleString('zh-CN')}`;
+  const hasFilter = ['gender','ageMin','ageMax','hireFrom','hireTo','empType'].some(k=>filters[k]) || search || dept;
+  const fr = document.getElementById('filterResult');
+  if (fr) fr.innerHTML = hasFilter ? `✓ 符合条件 <b>${list.length}</b> 人` : '';
   const hTh = document.getElementById('hireSortTh');
   const hIcon = document.getElementById('hireSortIcon');
   if (hTh) hTh.classList.toggle('active-sort', hireSort !== null);
