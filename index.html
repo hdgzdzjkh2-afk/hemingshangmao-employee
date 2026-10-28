@@ -179,6 +179,8 @@ tbody tr:hover{background:#f8fafc}
     </div>
     <div class="filter-panel" id="filterPanel">
       <div class="filter-row">
+        <div class="fg"><label>部门</label><select id="filt_dept"><option value="">全部</option></select></div>
+        <div class="fg"><label>职位</label><select id="filt_position"><option value="">全部</option></select></div>
         <div class="fg"><label>性别</label><select id="filt_gender"><option value="">全部</option><option value="男">男</option><option value="女">女</option></select></div>
         <div class="fg"><label>年龄范围</label><div class="filter-range"><input type="number" id="filt_age_min" placeholder="最小" min="0" max="100"> <span>—</span> <input type="number" id="filt_age_max" placeholder="最大" min="0" max="100"></div></div>
         <div class="fg"><label>入职时间</label><div class="filter-range"><input type="month" id="filt_hire_from"> <span>—</span> <input type="month" id="filt_hire_to"></div></div>
@@ -276,7 +278,7 @@ let editingId = null;
 let detailId = null;
 let hireSort = 'desc';
 let ageSort = null;
-let filters = { gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'', activeOnly:true };
+let filters = { dept:'', position:'', gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'', activeOnly:true };
 
 function toast(msg, type='success') {
   const t = document.getElementById('toast');
@@ -469,7 +471,8 @@ function fmtHireDate(date) {
 
 function render() {
   const search = document.getElementById('searchInput').value.toLowerCase();
-  const dept = document.getElementById('deptFilter').value;
+  const dept = filters.dept || '';
+  const position = filters.position || '';
   let list = [...employees];
 
   // Sorting
@@ -481,6 +484,7 @@ function render() {
   // Search & Dept filter
   if (search) list = list.filter(e => e.name.toLowerCase().includes(search)||e.position.toLowerCase().includes(search)||e.department.toLowerCase().includes(search));
   if (dept) list = list.filter(e => e.department === dept);
+  if (position) list = list.filter(e => e.position === position);
 
   // Advanced filters
   if (filters.gender) list = list.filter(e => e.gender === filters.gender);
@@ -497,6 +501,7 @@ function render() {
     let l = [...employees];
     if (search) l = l.filter(e => e.name.toLowerCase().includes(search)||e.position.toLowerCase().includes(search)||e.department.toLowerCase().includes(search));
     if (dept) l = l.filter(e => e.department === dept);
+    if (position) l = l.filter(e => e.position === position);
     if (filters.ageMin) l = l.filter(e => { const a = calcAgeRaw(e.birth_date); return !isNaN(a) && a >= parseInt(filters.ageMin); });
     if (filters.ageMax) l = l.filter(e => { const a = calcAgeRaw(e.birth_date); return !isNaN(a) && a <= parseInt(filters.ageMax); });
     if (filters.hireFrom) l = l.filter(e => e.hire_date && e.hire_date >= filters.hireFrom);
@@ -540,12 +545,19 @@ function render() {
     </div>
   `;
 
-  // Dept filter
+  // Dept filter (toolbar + filter panel, kept in sync)
   const depts = getAllDepts();
+  const deptOpts = depts.map(d=>`<option value="${escHtml(d)}" ${d===dept?'selected':''}>${escHtml(d)}</option>`).join('');
   const df = document.getElementById('deptFilter');
-  const curDept = df.value;
-  df.innerHTML = '<option value="">全部部门</option>'+depts.map(d=>`<option value="${escHtml(d)}" ${d===curDept?'selected':''}>${escHtml(d)}</option>`).join('');
+  if (df) df.innerHTML = '<option value="">全部部门</option>'+deptOpts;
+  const fdf = document.getElementById('filt_dept');
+  if (fdf) fdf.innerHTML = '<option value="">全部</option>'+deptOpts;
   document.getElementById('deptList').innerHTML = depts.map(d=>`<option value="${escHtml(d)}">`).join('');
+
+  // Position filter
+  const positions = [...new Set(employees.map(e=>e.position).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh'));
+  const fp = document.getElementById('filt_position');
+  if (fp) fp.innerHTML = '<option value="">全部</option>'+positions.map(p=>`<option value="${escHtml(p)}" ${p===position?'selected':''}>${escHtml(p)}</option>`).join('');
 
   // Table
   document.getElementById('listCount').textContent = `共 ${list.length} 人`;
@@ -575,7 +587,7 @@ function render() {
   `).join('');
 
   document.getElementById('tableFooter').textContent = `最后更新: ${new Date().toLocaleString('zh-CN')}`;
-  const hasFilter = ['gender','ageMin','ageMax','hireFrom','hireTo','empType'].some(k=>filters[k]) || search || dept;
+  const hasFilter = ['dept','position','gender','ageMin','ageMax','hireFrom','hireTo','empType'].some(k=>filters[k]) || search;
   const fr = document.getElementById('filterResult');
   if (fr) fr.innerHTML = hasFilter ? `✓ 符合条件 <b>${list.length}</b> 人` : '';
   const hTh = document.getElementById('hireSortTh');
@@ -626,23 +638,28 @@ function toggleAgeSort() {
 // ====== FILTERS ======
 function toggleFilter() { document.getElementById('filterPanel').classList.toggle('open'); }
 function toggleDeptPanel() { document.getElementById('deptPanel').classList.toggle('open'); renderDeptTags(); }
+const FILTER_KEYS = ['dept','position','gender','ageMin','ageMax','hireFrom','hireTo','empType'];
+function updateFilterBadge() {
+  const active = FILTER_KEYS.filter(k=>filters[k]).length;
+  const badge = document.getElementById('filterCount');
+  if (badge) { if (active) { badge.textContent = active; badge.classList.add('active'); } else badge.classList.remove('active'); }
+}
 function applyFilters() {
+  filters.dept = document.getElementById('filt_dept').value;
+  filters.position = document.getElementById('filt_position').value;
   filters.gender = document.getElementById('filt_gender').value;
   filters.ageMin = document.getElementById('filt_age_min').value;
   filters.ageMax = document.getElementById('filt_age_max').value;
   filters.hireFrom = document.getElementById('filt_hire_from').value;
   filters.hireTo = document.getElementById('filt_hire_to').value;
   filters.empType = document.getElementById('filt_emp_type').value;
-  const active = ['gender','ageMin','ageMax','hireFrom','hireTo','empType'].filter(k=>filters[k]).length;
-  const badge = document.getElementById('filterCount');
-  if (active) { badge.textContent = active; badge.classList.add('active'); }
-  else badge.classList.remove('active');
+  updateFilterBadge();
   render();
 }
 function resetFilters() {
-  filters = { gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'', activeOnly:true };
-  ['filt_gender','filt_age_min','filt_age_max','filt_hire_from','filt_hire_to','filt_emp_type'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('filterCount').classList.remove('active');
+  filters = { dept:'', position:'', gender:'', ageMin:'', ageMax:'', hireFrom:'', hireTo:'', empType:'', activeOnly:true };
+  ['filt_dept','filt_position','filt_gender','filt_age_min','filt_age_max','filt_hire_from','filt_hire_to','filt_emp_type'].forEach(id=>document.getElementById(id).value='');
+  updateFilterBadge();
   render();
 }
 
@@ -672,10 +689,7 @@ function filterByStat(type) {
   }
   document.getElementById('filt_gender').value = filters.gender;
   document.getElementById('filt_emp_type').value = filters.empType;
-  const active = ['gender','ageMin','ageMax','hireFrom','hireTo','empType'].filter(k=>filters[k]).length;
-  const badge = document.getElementById('filterCount');
-  if (active) { badge.textContent = active; badge.classList.add('active'); }
-  else badge.classList.remove('active');
+  updateFilterBadge();
   render();
 }
 
@@ -817,7 +831,13 @@ function exportData() {
 
 // ====== EVENT BINDINGS ======
 document.getElementById('searchInput').addEventListener('input', render);
-document.getElementById('deptFilter').addEventListener('change', render);
+document.getElementById('deptFilter').addEventListener('change', e => {
+  filters.dept = e.target.value;
+  const fdf = document.getElementById('filt_dept');
+  if (fdf) fdf.value = filters.dept;
+  updateFilterBadge();
+  render();
+});
 document.getElementById('formModal').addEventListener('click', e=>{if(e.target===e.currentTarget)closeFormModal()});
 document.getElementById('detailModal').addEventListener('click', e=>{if(e.target===e.currentTarget)closeDetailModal()});
 document.addEventListener('keydown', e=>{if(e.key==='Escape'){closeFormModal();closeDetailModal()}});
