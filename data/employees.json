@@ -400,20 +400,19 @@
     "id": "79df36e5-4242-45e2-85ae-7448476cfe63",
     "name": "王佳",
     "gender": "男",
-    "birth_date": "2000-04",
     "department": "鸿鹄组",
     "position": "运营",
+    "birth_date": "2000-04",
     "hire_date": "2026-07",
     "strengths": "英语四级",
     "weaknesses": "",
     "previous_job": "南阳家纺公司-业务部",
     "personality": "",
     "remarks": "比较聪明，理解能力好",
-    "employment_type": "未转正",
+    "employment_type": "已转正",
     "created_by": "Celeste",
-    "created_by_id": "4d602b71-bdbd-408a-b2c5-005d7afeae34",
     "created_at": "2026-07-28T06:38:16.163Z",
-    "updated_at": "2026-07-28T07:57:44.570Z"
+    "updated_at": "2026-11-05T02:57:56.588Z"
   },
   {
     "id": "3e0d4949-ac9c-4d46-9498-b069e2e60a8e",
