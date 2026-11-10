@@ -190,15 +190,20 @@ tbody tr:hover{background:#f8fafc}
     </div>
     <div class="filter-panel" id="deptPanel">
       <div class="filter-row">
-        <div class="fg" style="min-width:200px">
-          <label>新增部门</label>
+        <div class="fg" style="min-width:160px">
+          <label>部名称</label>
+          <input id="newPartInput" placeholder="如：运营部" onkeydown="if(event.key==='Enter')addDeptEntry()">
+        </div>
+        <div class="fg" style="min-width:160px">
+          <label>组名称（可留空，只建部）</label>
           <div style="display:flex;gap:6px">
-            <input id="newDeptInput" placeholder="输入新部门名称" style="flex:1" onkeydown="if(event.key==='Enter')addDept()">
-            <button class="btn btn-sm btn-primary" onclick="addDept()">添加</button>
+            <input id="newGroupInput" placeholder="如：晚柠组" style="flex:1" onkeydown="if(event.key==='Enter')addDeptEntry()">
+            <button class="btn btn-sm btn-primary" onclick="addDeptEntry()">添加</button>
           </div>
         </div>
+        <div style="font-size:11px;color:var(--text3);align-self:flex-end;padding-bottom:8px">员工部门将保存为「部-组」</div>
       </div>
-      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px" id="deptTagList"></div>
+      <div id="deptTagList" style="margin-top:10px"></div>
     </div>
     <div class="table-wrap">
       <div class="table-hdr"><h3>员工列表</h3><span style="font-size:12px;color:var(--text3)" id="listCount"></span></div>
@@ -224,7 +229,8 @@ tbody tr:hover{background:#f8fafc}
       <div class="form-grid">
         <div class="form-group"><label class="req">姓名</label><input id="f_name" placeholder="员工姓名"></div>
         <div class="form-group"><label>性别</label><select id="f_gender"><option value="">请选择</option><option value="男">男</option><option value="女">女</option></select></div>
-        <div class="form-group"><label class="req">部门</label><input id="f_department" list="deptList" placeholder="输入或选择部门"><datalist id="deptList"></datalist></div>
+        <div class="form-group"><label class="req">部</label><select id="f_dept_part" onchange="onFormPartChange()"><option value="">请选择部</option></select></div>
+        <div class="form-group"><label>组</label><select id="f_dept_group"><option value="">请选择组</option></select></div>
         <div class="form-group"><label>职位</label><input id="f_position" placeholder="如：产品经理"></div>
         <div class="form-group"><label>出生年月</label><input type="month" id="f_birth_date"></div>
         <div class="form-group"><label>入职时间</label><input type="month" id="f_hire_date"></div>
@@ -323,8 +329,11 @@ async function loadDepts() {
     if (!res.ok) { departments = []; deptsSha = ''; return; }
     const info = await res.json();
     deptsSha = info.sha;
-    departments = JSON.parse(decodeURIComponent(escape(atob(info.content))));
-    if (!Array.isArray(departments)) departments = [];
+    const raw = JSON.parse(decodeURIComponent(escape(atob(info.content))));
+    // 兼容旧格式（字符串数组）与新格式 [{name, groups}]
+    departments = (Array.isArray(raw) ? raw : [])
+      .map(d => typeof d === 'string' ? { name: d, groups: [] } : d)
+      .filter(d => d && d.name);
   } catch(e) { departments = []; }
 }
 
@@ -343,41 +352,85 @@ async function saveDepts() {
   } catch(e) { toast('保存部门失败: '+e.message, 'error'); throw e; }
 }
 
-async function addDept() {
-  const name = document.getElementById('newDeptInput').value.trim();
-  if (!name) return toast('请输入部门名称', 'error');
-  if (departments.includes(name)) return toast('该部门已存在', 'error');
-  departments.push(name);
-  departments.sort();
+async function addDeptEntry() {
+  const part = document.getElementById('newPartInput').value.trim();
+  const grp = document.getElementById('newGroupInput').value.trim();
+  if (!part) return toast('请输入部名称', 'error');
+  let d = departments.find(x => x.name === part);
+  if (!d) {
+    d = { name: part, groups: [] };
+    departments.push(d);
+    departments.sort((a,b) => a.name.localeCompare(b.name, 'zh'));
+  }
+  if (grp) {
+    if (d.groups.includes(grp)) return toast('「' + part + '」下已有「' + grp + '」', 'error');
+    d.groups.push(grp);
+    d.groups.sort((a,b) => a.localeCompare(b, 'zh'));
+  }
   await saveDepts();
-  document.getElementById('newDeptInput').value = '';
-  toast('部门已添加', 'success');
+  document.getElementById('newPartInput').value = '';
+  document.getElementById('newGroupInput').value = '';
+  toast(grp ? '已添加 ' + part + ' - ' + grp : '已添加 ' + part, 'success');
   render();
 }
 
-async function removeDept(name) {
-  const usedBy = employees.filter(e => e.department === name);
-  let confirmMsg = `确定要删除部门「${name}」吗？`;
+async function removeDeptGroup(partName, groupName) {
+  const full = partName + '-' + groupName;
+  const usedBy = employees.filter(e => e.department === full || e.department === groupName);
+  let confirmMsg = `确定要删除「${full}」吗？`;
   if (usedBy.length > 0) {
-    confirmMsg += `\n注意：该部门被 ${usedBy.length} 名员工使用，删除将清空这些员工的部门字段。`;
+    confirmMsg += `\n注意：该组被 ${usedBy.length} 名员工使用，删除将清空这些员工的部门字段。`;
   }
   if (!confirm(confirmMsg)) return;
-  // Remove from preset list
-  departments = departments.filter(d => d !== name);
+  const d = departments.find(x => x.name === partName);
+  if (d) d.groups = d.groups.filter(g => g !== groupName);
   await saveDepts();
-  // Clear department from employees who used it
   if (usedBy.length > 0) {
-    employees.forEach(e => { if (e.department === name) e.department = ''; });
-    await saveData('清空已删除部门的员工部门字段');
+    employees.forEach(e => { if (e.department === full || e.department === groupName) e.department = ''; });
+    await saveData('清空已删除小组的员工部门字段');
   }
-  toast('部门已删除', 'success');
+  toast('小组已删除', 'success');
   render();
+}
+
+async function removeDeptPart(partName) {
+  const d = departments.find(x => x.name === partName);
+  const groups = d ? d.groups : [];
+  const usedBy = employees.filter(e => e.department === partName || (e.department||'').startsWith(partName + '-') || groups.includes(e.department));
+  let confirmMsg = `确定要删除部「${partName}」吗？` + (groups.length ? `\n其下的 ${groups.length} 个小组将一并删除。` : '');
+  if (usedBy.length > 0) {
+    confirmMsg += `\n注意：该部被 ${usedBy.length} 名员工使用，删除将清空这些员工的部门字段。`;
+  }
+  if (!confirm(confirmMsg)) return;
+  departments = departments.filter(x => x.name !== partName);
+  await saveDepts();
+  if (usedBy.length > 0) {
+    employees.forEach(e => {
+      if (e.department === partName || (e.department||'').startsWith(partName + '-') || groups.includes(e.department)) e.department = '';
+    });
+    await saveData('清空已删除部的员工部门字段');
+  }
+  toast('部已删除', 'success');
+  render();
+}
+
+function getDeptTree() {
+  // departments: [{name, groups}]；legacy = 员工档案中存在、但不属于任何已管理部/组的值
+  const tree = departments.map(d => ({ name: d.name, groups: [...(d.groups||[])] }));
+  const legacy = new Set();
+  employees.map(e=>e.department).filter(Boolean).forEach(v => {
+    const matched = tree.some(d => v === d.name || d.groups.includes(v) || v.startsWith(d.name + '-'));
+    if (!matched) legacy.add(v);
+  });
+  return { tree, legacy: [...legacy].sort() };
 }
 
 function getAllDepts() {
-  // Merge managed departments + departments found in employees
-  const empDepts = employees.map(e=>e.department).filter(Boolean);
-  return [...new Set([...departments, ...empDepts])].sort();
+  // 所有可选部门完整值：部本身、部-组、员工档案中的遗留值
+  const { tree, legacy } = getDeptTree();
+  const vals = [];
+  tree.forEach(d => { vals.push(d.name); d.groups.forEach(g => vals.push(d.name + '-' + g)); });
+  return [...new Set([...vals, ...legacy])].sort();
 }
 
 // ====== AUTH ======
@@ -545,14 +598,12 @@ function render() {
     </div>
   `;
 
-  // Dept filter (toolbar + filter panel, kept in sync)
-  const depts = getAllDepts();
-  const deptOpts = depts.map(d=>`<option value="${escHtml(d)}" ${d===dept?'selected':''}>${escHtml(d)}</option>`).join('');
+  // Dept filter (toolbar + filter panel, kept in sync) — grouped by 部
+  const deptOpts = buildDeptFilterOptions(dept);
   const df = document.getElementById('deptFilter');
-  if (df) df.innerHTML = '<option value="">全部部门</option>'+deptOpts;
+  if (df) df.innerHTML = '<option value="">全部部门</option>' + deptOpts;
   const fdf = document.getElementById('filt_dept');
-  if (fdf) fdf.innerHTML = '<option value="">全部</option>'+deptOpts;
-  document.getElementById('deptList').innerHTML = depts.map(d=>`<option value="${escHtml(d)}">`).join('');
+  if (fdf) fdf.innerHTML = '<option value="">全部</option>' + deptOpts;
 
   // Position filter
   const positions = [...new Set(employees.map(e=>e.position).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh'));
@@ -601,22 +652,89 @@ function render() {
   renderDeptTags();
 }
 
+function buildDeptFilterOptions(selected) {
+  const { tree, legacy } = getDeptTree();
+  let html = '';
+  tree.forEach(d => {
+    if (d.groups.length === 0) {
+      html += `<option value="${escHtml(d.name)}" ${d.name===selected?'selected':''}>${escHtml(d.name)}</option>`;
+      return;
+    }
+    html += `<optgroup label="${escHtml(d.name)}">`;
+    html += `<option value="${escHtml(d.name)}" ${d.name===selected?'selected':''}>${escHtml(d.name)}（整部）</option>`;
+    d.groups.forEach(g => {
+      const v = d.name + '-' + g;
+      html += `<option value="${escHtml(v)}" ${v===selected?'selected':''}>${escHtml(g)}</option>`;
+    });
+    html += '</optgroup>';
+  });
+  legacy.forEach(v => {
+    html += `<option value="${escHtml(v)}" ${v===selected?'selected':''}>${escHtml(v)}（旧）</option>`;
+  });
+  return html;
+}
+
 function renderDeptTags() {
   if (!document.getElementById('deptPanel').classList.contains('open')) return;
-  const list = getAllDepts();
   const el = document.getElementById('deptTagList');
-  if (list.length === 0) {
-    el.innerHTML = '<span style="font-size:12px;color:var(--text3)">暂无部门，可从员工档案中自动提取，或在上方手动添加</span>';
+  const { tree, legacy } = getDeptTree();
+  if (tree.length === 0 && legacy.length === 0) {
+    el.innerHTML = '<span style="font-size:12px;color:var(--text3)">暂无部门，请在上方添加部、组</span>';
     return;
   }
-  el.innerHTML = list.map(d => {
-    const count = employees.filter(e => e.department === d).length;
-    return `
-    <span style="display:inline-flex;align-items:center;gap:4px;background:#eef2ff;color:var(--primary);padding:4px 12px;border-radius:20px;font-size:12px;">
-      ${escHtml(d)}${count > 0 ? `<span style="opacity:.7;font-size:10px">(${count})</span>` : ''}
-      <button onclick="removeDept('${escHtml(d)}')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;line-height:1;padding:0" title="删除">×</button>
-    </span>`;
-  }).join('');
+  let html = '';
+  tree.forEach(d => {
+    const partCount = employees.filter(e => e.department === d.name || (e.department||'').startsWith(d.name + '-')).length;
+    html += `<div style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="display:inline-flex;align-items:center;gap:6px;background:var(--primary);color:#fff;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;">
+          🏢 ${escHtml(d.name)}<span style="opacity:.75;font-size:10px">${partCount}人</span>
+          <button onclick="removeDeptPart('${escHtml(d.name)}')" style="background:none;border:none;cursor:pointer;color:#fff;opacity:.8;font-size:14px;line-height:1;padding:0" title="删除整个部">×</button>
+        </span>
+      </div>`;
+    if (d.groups.length === 0) {
+      html += `<div style="font-size:11px;color:var(--text3);margin-left:8px">暂无小组</div>`;
+    } else {
+      html += `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-left:8px">`;
+      d.groups.forEach(g => {
+        const v = d.name + '-' + g;
+        const count = employees.filter(e => e.department === v || e.department === g).length;
+        html += `<span style="display:inline-flex;align-items:center;gap:4px;background:#eef2ff;color:var(--primary);padding:4px 12px;border-radius:20px;font-size:12px;">
+          ${escHtml(g)}${count > 0 ? `<span style="opacity:.7;font-size:10px">(${count})</span>` : ''}
+          <button onclick="removeDeptGroup('${escHtml(d.name)}','${escHtml(g)}')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;line-height:1;padding:0" title="删除小组">×</button>
+        </span>`;
+      });
+      html += `</div>`;
+    }
+    html += `</div>`;
+  });
+  if (legacy.length > 0) {
+    html += `<div style="margin-bottom:6px;font-size:11px;color:var(--text3)">以下为历史数据（未归类到部），编辑员工时重新选择即可归类：</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-left:8px">`;
+    legacy.forEach(v => {
+      const count = employees.filter(e => e.department === v).length;
+      html += `<span style="display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;color:#64748b;padding:4px 12px;border-radius:20px;font-size:12px;">
+        ${escHtml(v)}${count > 0 ? `<span style="opacity:.7;font-size:10px">(${count})</span>` : ''}
+        <button onclick="removeLegacyDept('${escHtml(v)}')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;line-height:1;padding:0" title="删除">×</button>
+      </span>`;
+    });
+    html += `</div>`;
+  }
+  el.innerHTML = html;
+}
+
+async function removeLegacyDept(name) {
+  const usedBy = employees.filter(e => e.department === name);
+  let confirmMsg = `确定要从列表中移除「${name}」吗？`;
+  if (usedBy.length > 0) {
+    confirmMsg += `\n注意：该值被 ${usedBy.length} 名员工使用，删除将清空这些员工的部门字段。`;
+  }
+  if (!confirm(confirmMsg)) return;
+  if (usedBy.length > 0) {
+    employees.forEach(e => { if (e.department === name) e.department = ''; });
+    await saveData('清空已删除部门的员工部门字段');
+  }
+  toast('已移除', 'success');
+  render();
 }
 
 // ====== HIRE SORT ======
@@ -707,7 +825,7 @@ function openEditModal(id) {
   if (!e) return;
   document.getElementById('f_name').value = e.name;
   document.getElementById('f_gender').value = e.gender;
-  document.getElementById('f_department').value = e.department;
+  setFormDept(e.department || '');
   document.getElementById('f_position').value = e.position;
   document.getElementById('f_birth_date').value = e.birth_date;
   document.getElementById('f_hire_date').value = e.hire_date;
@@ -720,7 +838,44 @@ function openEditModal(id) {
   document.getElementById('formModal').classList.add('active');
 }
 function clearForm() {
-  ['f_name','f_gender','f_department','f_position','f_birth_date','f_hire_date','f_strengths','f_weaknesses','f_previous_job','f_personality','f_employment_type','f_remarks'].forEach(id=>document.getElementById(id).value='');
+  ['f_name','f_gender','f_position','f_birth_date','f_hire_date','f_strengths','f_weaknesses','f_previous_job','f_personality','f_employment_type','f_remarks'].forEach(id=>document.getElementById(id).value='');
+  buildFormDeptOptions('', '');
+}
+
+// ====== DEPT FORM (部-组) ======
+function buildFormDeptOptions(selectedPart, selectedGroup) {
+  const { tree, legacy } = getDeptTree();
+  const partSel = document.getElementById('f_dept_part');
+  let opts = '<option value="">请选择部</option>';
+  tree.forEach(d => { opts += `<option value="${escHtml(d.name)}" ${d.name===selectedPart?'selected':''}>${escHtml(d.name)}</option>`; });
+  if (selectedPart && !tree.some(d => d.name === selectedPart)) {
+    opts += `<option value="${escHtml(selectedPart)}" selected>${escHtml(selectedPart)}（旧）</option>`;
+  }
+  partSel.innerHTML = opts;
+  const gSel = document.getElementById('f_dept_group');
+  let gopts = '<option value="">请选择组</option>';
+  const d = tree.find(x => x.name === selectedPart);
+  if (d) d.groups.forEach(g => { gopts += `<option value="${escHtml(g)}" ${g===selectedGroup?'selected':''}>${escHtml(g)}</option>`; });
+  if (selectedGroup && (!d || !d.groups.includes(selectedGroup))) {
+    gopts += `<option value="${escHtml(selectedGroup)}" selected>${escHtml(selectedGroup)}${d ? '' : '（旧）'}</option>`;
+  }
+  gSel.innerHTML = gopts;
+}
+function onFormPartChange() { buildFormDeptOptions(document.getElementById('f_dept_part').value, ''); }
+function setFormDept(dep) {
+  if (!dep) return buildFormDeptOptions('', '');
+  const pi = dep.indexOf('-');
+  const part = pi > 0 ? dep.slice(0, pi) : '';
+  const grp = pi > 0 ? dep.slice(pi + 1) : dep;
+  buildFormDeptOptions(part, grp);
+}
+function getFormDept() {
+  const part = document.getElementById('f_dept_part').value;
+  const grp = document.getElementById('f_dept_group').value;
+  if (part && grp) return part + '-' + grp;
+  if (part) return part;
+  if (grp) return grp;
+  return '';
 }
 function closeFormModal() { document.getElementById('formModal').classList.remove('active'); editingId = null; }
 
@@ -729,7 +884,7 @@ async function saveEmployee() {
     id: editingId || 'e_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
     name: document.getElementById('f_name').value.trim(),
     gender: document.getElementById('f_gender').value,
-    department: document.getElementById('f_department').value.trim(),
+    department: getFormDept(),
     position: document.getElementById('f_position').value.trim(),
     birth_date: document.getElementById('f_birth_date').value,
     hire_date: document.getElementById('f_hire_date').value,
