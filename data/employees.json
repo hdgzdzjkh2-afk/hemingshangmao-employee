@@ -489,9 +489,9 @@
     "id": "06f6ad22-94fb-4d5e-ab18-ea64fcee41f7",
     "name": "杨淑优",
     "gender": "女",
-    "birth_date": "2005-01",
-    "department": "智趣组",
+    "department": "长风部-智趣组",
     "position": "运营",
+    "birth_date": "2005-01",
     "hire_date": "2026-07",
     "strengths": "",
     "weaknesses": "",
@@ -500,9 +500,8 @@
     "remarks": "不爱说话",
     "employment_type": "未转正",
     "created_by": "Celeste",
-    "created_by_id": "4d602b71-bdbd-408a-b2c5-005d7afeae34",
     "created_at": "2026-07-28T06:47:49.298Z",
-    "updated_at": "2026-07-28T08:01:45.619Z"
+    "updated_at": "2026-11-10T06:36:41.078Z"
   },
   {
     "id": "66745331-d3dd-493b-ad64-54b3352c87bb",
