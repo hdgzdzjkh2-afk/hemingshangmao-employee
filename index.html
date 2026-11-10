@@ -536,7 +536,7 @@ function render() {
 
   // Search & Dept filter
   if (search) list = list.filter(e => e.name.toLowerCase().includes(search)||e.position.toLowerCase().includes(search)||e.department.toLowerCase().includes(search));
-  if (dept) list = list.filter(e => e.department === dept);
+  if (dept) list = list.filter(e => e.department === dept || (e.department||'').startsWith(dept + '-'));
   if (position) list = list.filter(e => e.position === position);
 
   // Advanced filters
@@ -553,7 +553,7 @@ function render() {
   const statList = (() => {
     let l = [...employees];
     if (search) l = l.filter(e => e.name.toLowerCase().includes(search)||e.position.toLowerCase().includes(search)||e.department.toLowerCase().includes(search));
-    if (dept) l = l.filter(e => e.department === dept);
+    if (dept) l = l.filter(e => e.department === dept || (e.department||'').startsWith(dept + '-'));
     if (position) l = l.filter(e => e.position === position);
     if (filters.ageMin) l = l.filter(e => { const a = calcAgeRaw(e.birth_date); return !isNaN(a) && a >= parseInt(filters.ageMin); });
     if (filters.ageMax) l = l.filter(e => { const a = calcAgeRaw(e.birth_date); return !isNaN(a) && a <= parseInt(filters.ageMax); });
